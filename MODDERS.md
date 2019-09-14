@@ -15,3 +15,4 @@ use 3dsmax or blender and make some shit
 	</AI_HeelsData>
 ```
 ## Load and Test
+You can reload some heel's information in-game by putting and modifying heels_manifest.xml on root folder (the folder that executable exists).
