@@ -52,7 +52,7 @@ namespace Heelz
 
         internal static new ManualLogSource Logger;
 
-        void Log(string str) { if (isVerbose.Value) Logger.LogInfo(str); }
+        private static void Log(string str) { if (isVerbose.Value) Logger.LogInfo(str); }
 
         private void Start()
         {
@@ -78,7 +78,7 @@ namespace Heelz
 
                     if (File.Exists(devXMLPath))
                     {
-                        Logger.LogError("Development File Detected! Updating heels as soon as it's getting updated!");
+                        Log("Development File Detected! Updating heels as soon as it's getting updated!");
 
                         FileSystemWatcher fsWatcher = new FileSystemWatcher(rootPath.ToString()) { EnableRaisingEvents = true };
                         FileSystemEventHandler eventHandler = null;
@@ -86,7 +86,7 @@ namespace Heelz
                         {
                             XmlDocument devdoc = new XmlDocument();
                             devdoc.Load(devXMLPath);
-                            Logger.LogWarning("Heel Development file has been updated!");
+                            Log("Heel Development file has been updated!");
                             LoadXML(XDocument.Parse(devdoc.OuterXml), true);
                         };
                         fsWatcher.Changed += eventHandler;
@@ -96,8 +96,8 @@ namespace Heelz
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError("Tried to load heel Development XML, but failed!");
-                    Logger.LogError(e.ToString());
+                    Log("Tried to load heel Development XML, but failed!");
+                    Log(e.ToString());
                 }
             }
         }
@@ -114,7 +114,7 @@ namespace Heelz
                     ResolveInfo resolvedID = UniversalAutoResolver.TryGetResolutionInfo(heelID, "ChaFileClothes.ClothesShoes", guid);
                     if (resolvedID != null)
                     {
-                        Logger.LogInfo(String.Format("Found Resolved ID: \"{0}\"=>\"{1}\"", heelID, resolvedID.LocalSlot));
+                        Log(String.Format("Found Resolved ID: \"{0}\"=>\"{1}\"", heelID, resolvedID.LocalSlot));
                         heelID = resolvedID.LocalSlot;
                     }
 
@@ -138,7 +138,7 @@ namespace Heelz
                     int heelID = int.Parse(element.Attribute("id")?.Value);
                     if (heelConfigs.ContainsKey(heelID))
                     {
-                        Logger.LogError(String.Format("CONFLITING HEEL DATA! Shoe ID {0} already has heel data.", heelID));
+                        Log(String.Format("CONFLITING HEEL DATA! Shoe ID {0} already has heel data.", heelID));
                         return;
                     }
 
@@ -204,14 +204,14 @@ namespace Heelz
                             ResolveInfo resolvedID = UniversalAutoResolver.TryGetResolutionInfo(heelID, "ChaFileClothes.ClothesShoes", guid);
                             if (resolvedID != null)
                             {
-                                Logger.LogInfo(String.Format("Found Resolved ID: \"{0}\"=>\"{1}\"", heelID, resolvedID.LocalSlot));
+                                Log(String.Format("Found Resolved ID: \"{0}\"=>\"{1}\"", heelID, resolvedID.LocalSlot));
                                 heelID = resolvedID.LocalSlot;
                             }
 
                             heelConfigs.Add(heelID, newConfig);
-                            Logger.LogInfo(String.Format("Registered new heel config for follwing ID: \"{0}\"", heelID));
+                            Log(String.Format("Registered new heel config for follwing ID: \"{0}\"", heelID));
                         }
-                        catch (Exception e) { Logger.LogError(e.ToString()); }
+                        catch (Exception e) { Log(e.ToString()); }
                     }
                 }
             }
@@ -245,17 +245,17 @@ namespace Heelz
                 GameObject shoeGameObject = ChaControl.objClothes[7];
                 HeelConfig shoeConfig;
 
-                Logger.LogInfo(String.Format("Looking for ID: \"{0}\"", shoeID));
+                Log(String.Format("Looking for ID: \"{0}\"", shoeID));
                 if (heelConfigs.TryGetValue(shoeID, out shoeConfig) && shoeConfig.loaded == true)
                 {
-                    Logger.LogInfo("Found! Removing Transforms..");
+                    Log("Found! Removing Transforms..");
                     RemoveLocalTransforms();
-                    Logger.LogInfo("Found! Setting up Transforms..");
+                    Log("Found! Setting up Transforms..");
                     LocalTransforms(shoeConfig);
                 }
                 else
                 {
-                    Logger.LogInfo("Not Found! Removing Transforms..");
+                    Log("Not Found! Removing Transforms..");
                     RemoveLocalTransforms();
                 }
             }
@@ -269,14 +269,7 @@ namespace Heelz
             public void RemoveLocalTransforms()
             {
                 currentConfig = null;
-                foreach (KeyValuePair<Transform, Vector3[]> macros in transformVectors)
-                {
-                    Transform targetTransform = macros.Key;
 
-                    targetTransform.localPosition = Vector3.zero;
-                    targetTransform.localScale = Vector3.one;
-                    targetTransform.localEulerAngles = Vector3.zero;
-                }
                 ChaControl.gameObject.transform.Find(pathRoot).localPosition = Vector3.zero;
 
                 transformVectors.Clear();
