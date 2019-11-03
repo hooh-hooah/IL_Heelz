@@ -12,6 +12,7 @@ using KKAPI;
 using BepInEx.Harmony;
 using RootMotion.FinalIK;
 using Sideloader.AutoResolver;
+using UnityEngine.AI;
 using System.Text;
 using System.Xml;
 using System.IO;
@@ -234,6 +235,7 @@ namespace Heelz
             protected override void OnReload(GameMode currentGameMode, bool maintainState) => SetUpShoes();
 
             public HeelConfig currentConfig;
+            private float originalOffset = 0;
             private Dictionary<Transform, Vector3[]> transformVectors = new Dictionary<Transform, Vector3[]>();
             private Dictionary<Transform, bool> parentDerivation = new Dictionary<Transform, bool>();
 
@@ -270,7 +272,13 @@ namespace Heelz
             {
                 currentConfig = null;
 
-                ChaControl.gameObject.transform.Find(pathRoot).localPosition = Vector3.zero;
+                Transform parent = ChaControl?.gameObject?.transform?.parent;
+                if (parent != null)
+                {
+                    NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
+                    agent.baseOffset = originalOffset;
+                }
+                //ChaControl.gameObject.transform.Find(pathRoot).localPosition = Vector3.zero;
 
                 transformVectors.Clear();
                 parentDerivation.Clear();
@@ -284,7 +292,14 @@ namespace Heelz
                 currentConfig = heelConfig;
                 // TODO: keep old value or calculate ABM or character value.
 
-                ChaControl.gameObject.transform.Find(pathRoot).localPosition = heelConfig.rootMove;
+                Transform parent = ChaControl?.gameObject?.transform?.parent;
+                if (parent != null)
+                {
+                    NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
+                    originalOffset = agent.baseOffset;
+                    agent.baseOffset = originalOffset + heelConfig.rootMove.y;
+                }
+                //ChaControl.gameObject.transform.Find(pathRoot).localPosition = heelConfig.rootMove;
 
                 foreach(KeyValuePair<string, string> pair in pathMaps)
                 {
