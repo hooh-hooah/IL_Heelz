@@ -32,7 +32,7 @@ namespace Heelz
     public partial class HeelPlugin : BaseUnityPlugin
     {
         public const string GUID = "com.hooh.heelz";
-        public const string VERSION = "1.0.0";
+        public const string VERSION = "1.0.3";
         public static Dictionary<int, HeelConfig> heelConfigs = new Dictionary<int, HeelConfig>();
         public static String[] parts = { "foot01", "foot02", "toes01" };
         public static String[] modifiers = { "move", "roll", "scale" };
@@ -53,7 +53,7 @@ namespace Heelz
 
         internal static new ManualLogSource Logger;
 
-        private static void Log(string str) { if (isVerbose.Value) Logger.LogInfo(str); }
+        private static void Log(string str) { if (isVerbose.Value) Logger.LogDebug(str); }
 
         private void Start()
         {
@@ -75,7 +75,7 @@ namespace Heelz
                 try
                 {
                     string rootPath = Directory.GetParent(Application.dataPath).ToString();
-                    string devXMLPath = rootPath  + "/heel_manifest.xml";
+                    string devXMLPath = rootPath + "/heel_manifest.xml";
 
                     if (File.Exists(devXMLPath))
                     {
@@ -166,7 +166,7 @@ namespace Heelz
                                     {
                                         Vector3 vector = new Vector3(float.Parse(split[0]), float.Parse(split[1]), float.Parse(split[2]));
                                         vectors.Add(modKey, vector);
-                                    } else vectors.Add(modKey, modKey=="scale"?Vector3.one:Vector3.zero); // Yeah.. if there is no scale, don't fuck it up.
+                                    } else vectors.Add(modKey, modKey == "scale" ? Vector3.one : Vector3.zero); // Yeah.. if there is no scale, don't fuck it up.
                                     Log(String.Format("\t{0}_{1}: {2}", partKey, modKey, vectors[modKey].ToString()));
 
                                     if (modKey == "roll")
@@ -175,7 +175,7 @@ namespace Heelz
                                         String[] maxs = partElement.Element(modKey)?.Attribute("max")?.Value?.Split(',');
                                         if (mins != null)
                                         {
-                                            vectors.Add(modKey + "min",new Vector3(float.Parse(mins[0]), float.Parse(mins[1]), float.Parse(mins[2])));
+                                            vectors.Add(modKey + "min", new Vector3(float.Parse(mins[0]), float.Parse(mins[1]), float.Parse(mins[2])));
                                             Log(String.Format("\t{0}_{1}: {2}", partKey, modKey + "min", vectors[modKey + "min"].ToString()));
                                         }
                                         if (maxs != null)
@@ -221,27 +221,115 @@ namespace Heelz
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
         public static void ChangeCustomClothes(ChaControl __instance, int kind)
         {
-            if (kind == 7) 
+            if (kind == 7)
                 GetAPIController(__instance)?.SetUpShoes();
         }
+
+        public static Dictionary<string, Dictionary<int, bool>> whitelist = new Dictionary<string, Dictionary<int, bool>>()
+        {
+            {"animator/h/female/01/sonyu.unity3d", new Dictionary<int, bool>() {
+                { 21, true }, { 22, true }, { 26, true }
+            } },
+            {"animator/h/female/01/aibu.unity3d", new Dictionary<int, bool>() {
+                { 12, true }, { 13, true }, { 17, true }
+            } },
+        };
+
+        public static bool isElevated = true;
+        public static bool isChanging = false;
+        public static Vector3 savedOffset = Vector3.zero;
+        public static Vector3[] savedPositions = new Vector3[4]; // Hscene.cs:395, 397 - Scene has 4 character limit.
+        public static ChaControl[] savedControls = new ChaControl[4];
+
+        [HarmonyPostfix, HarmonyPatch(typeof(HScene), nameof(HScene.ChangeAnimation))]
+        public static void ChangeAnimation(HScene __instance, HScene.AnimationListInfo _info, bool _isForceResetCamera, bool _isForceLoopAction = false, bool _UseFade = true)
+        {
+            ChaControl[] chaFemales = Traverse.Create(__instance).Field("chaFemales").GetValue<ChaControl[]>();
+            ChaControl[] chaMales = Traverse.Create(__instance).Field("chaMales").GetValue<ChaControl[]>();
+
+            ChaControl mainChar = chaFemales[0];
+            HeelsController mainCharController = GetAPIController(mainChar);
+
+            if (mainCharController?.currentConfig != null)
+            {
+                isChanging = true;
+                savedOffset = mainCharController.currentConfig.rootMove;
+
+                if (chaFemales[0] != null && savedPositions[0] == Vector3.zero) savedPositions[0] = chaFemales[0].transform.position;
+                if (chaFemales[1] != null && savedPositions[1] == Vector3.zero) savedPositions[1] = chaFemales[1].transform.position;
+                if (chaMales[0] != null && savedPositions[2] == Vector3.zero) savedPositions[2] = chaMales[0].transform.position;
+                if (chaMales[1] != null && savedPositions[3] == Vector3.zero) savedPositions[3] = chaMales[1].transform.position;
+
+                if (whitelist.ContainsKey(_info.assetpathFemale) && whitelist[_info.assetpathFemale] != null) {
+                    Dictionary<int, bool> idDict = whitelist[_info.assetpathFemale];
+                    if (idDict.ContainsKey(_info.id) && idDict[_info.id]) {
+                        isElevated = true;
+                    } else isElevated = false;
+                } else isElevated = false;
+
+                if (chaFemales[0] != null) savedControls[0] = chaFemales[0];
+                if (chaFemales[1] != null) savedControls[1] = chaFemales[1];
+                if (chaMales[0] != null) savedControls[2] = chaMales[0];
+                if (chaMales[1] != null) savedControls[3] = chaMales[1]; 
+            }
+
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(HPointCtrl), "Update")]
+        public static void UpdateSomehow(HPointCtrl __instance)
+        {
+            HScene hscene = Traverse.Create(__instance).Field("hScene").GetValue<HScene>();
+
+            if (isChanging && !hscene.NowChangeAnim)
+            {
+                if (isElevated)
+                {
+                    if (savedControls[0] != null) savedControls[0].transform.position = savedPositions[0];
+                    if (savedControls[1] != null) savedControls[1].transform.position = savedPositions[1]; // if it has heels then nut and go
+                    if (savedControls[2] != null) savedControls[2].transform.position = savedPositions[2] - savedOffset; // male does not have heels
+                    if (savedControls[3] != null) savedControls[3].transform.position = savedPositions[3] - savedOffset; // male does not have heels
+                }
+                else
+                {
+                    if (savedControls[0] != null) savedControls[0].transform.position = savedPositions[0] - savedOffset;
+                    if (savedControls[1] != null) savedControls[1].transform.position = savedPositions[1] - savedOffset; // if it has heels then nut and go.
+                    if (savedControls[2] != null) savedControls[2].transform.position = savedPositions[2] - savedOffset;
+                    if (savedControls[3] != null) savedControls[3].transform.position = savedPositions[3] - savedOffset;
+                }
+
+                isChanging = false;
+            }
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(HScene), "EndProc")]
+        public static void EndProc(HScene __instance)
+        {
+            savedOffset = Vector3.zero;
+            for (int i = 0; i < savedPositions.Length; i++)
+                savedPositions[i] = Vector3.zero;
+            for (int i = 0; i< savedControls.Length; i++)
+                savedControls[i] = null;
+        }
+
+        // add when clothes status has been changed ingame.
 
         private static HeelsController GetAPIController(ChaControl character) => character?.gameObject?.GetComponent<HeelsController>();
 
         public class HeelsController : CharaCustomFunctionController
         {
-
             //not saving anything but still must implement
             protected override void OnCardBeingSaved(GameMode currentGameMode) { }
             protected override void OnReload(GameMode currentGameMode, bool maintainState) => SetUpShoes();
 
             public HeelConfig currentConfig;
-            private float originalOffset = 0;
+            private bool onGroundAnim = false;
+            private readonly float originalOffset = 0; // it's fixed value. 
             private Dictionary<Transform, Vector3[]> transformVectors = new Dictionary<Transform, Vector3[]>();
             private Dictionary<Transform, bool> parentDerivation = new Dictionary<Transform, bool>();
 
             public void SetUpShoes()
             {
-                if (ChaControl.objClothes[shoeCategory] == null) return;
+                if (ChaControl == null || ChaControl.objClothes[shoeCategory] == null) return;
 
                 int shoeID = ChaControl.nowCoordinate.clothes.parts[7].id;
                 GameObject shoeGameObject = ChaControl.objClothes[7];
@@ -254,32 +342,50 @@ namespace Heelz
                     RemoveLocalTransforms();
                     Log("Found! Setting up Transforms..");
                     LocalTransforms(shoeConfig);
-                }
-                else
-                {
+                } else {
                     Log("Not Found! Removing Transforms..");
                     RemoveLocalTransforms();
                 }
             }
 
             // You can't fly while sitting around or having a sex you moron
-            public void DisableHover() => ChaControl.gameObject.transform.Find(pathRoot).localPosition = Vector3.zero;
-
-            // start flying again cuz you're not getting laid
-            public void EnableHover() => ChaControl.gameObject.transform.Find(pathRoot).localPosition = currentConfig.rootMove;
-            
-            public void RemoveLocalTransforms()
+            public void DisableHover()
             {
-                currentConfig = null;
-
                 Transform parent = ChaControl?.gameObject?.transform?.parent;
-                if (parent != null)
-                {
+
+                if (parent != null) {
                     NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
                     agent.baseOffset = originalOffset;
                 }
-                //ChaControl.gameObject.transform.Find(pathRoot).localPosition = Vector3.zero;
+            }
 
+            // start flying again cuz you're not getting laid
+            public void EnableHover()
+            {
+                Transform parent = ChaControl?.gameObject?.transform?.parent;
+
+                if (parent != null) {
+                    NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
+                    agent.baseOffset = originalOffset + currentConfig.rootMove.y;
+                }
+            }
+
+            public void UpdateHover()
+            {
+                if (onGroundAnim) DisableHover(); else EnableHover();
+            }
+
+            public void SetGroundMode(bool _bool)
+            {
+                onGroundAnim = _bool;
+            }
+            
+            public void RemoveLocalTransforms()
+            {
+                if (ChaControl == null) return;
+                currentConfig = null;
+
+                DisableHover();
                 transformVectors.Clear();
                 parentDerivation.Clear();
 
@@ -289,19 +395,12 @@ namespace Heelz
 
             public void LocalTransforms(HeelConfig heelConfig)
             {
+                if (ChaControl == null) return;
                 currentConfig = heelConfig;
                 // TODO: keep old value or calculate ABM or character value.
+                EnableHover();
 
-                Transform parent = ChaControl?.gameObject?.transform?.parent;
-                if (parent != null)
-                {
-                    NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
-                    originalOffset = agent.baseOffset;
-                    agent.baseOffset = originalOffset + heelConfig.rootMove.y;
-                }
-                //ChaControl.gameObject.transform.Find(pathRoot).localPosition = heelConfig.rootMove;
-
-                foreach(KeyValuePair<string, string> pair in pathMaps)
+                foreach (KeyValuePair<string, string> pair in pathMaps)
                 {
                     Dictionary<string, Vector3> partVectors;
                     heelConfig.heelVectors.TryGetValue(pair.Value, out partVectors);
