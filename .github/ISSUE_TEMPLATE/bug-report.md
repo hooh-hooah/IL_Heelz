@@ -12,10 +12,10 @@ A clear and concise description of what the bug is. (Adding your thoughts also g
 
 **To Reproduce (VERY IMPORTANT)**
 Steps to reproduce the behavior:
-1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
-4. See error
+1. Play Main Game/Studio
+2. Do something
+3. Oops it's fucking up
+4. Yeah this is it.
 
 **Expected behavior**
 A clear and concise description of what you expected to happen.
