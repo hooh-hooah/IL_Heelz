@@ -355,7 +355,7 @@ namespace Heelz
 
                 if (parent != null) {
                     NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
-                    agent.baseOffset = originalOffset;
+                    if (agent != null) { agent.baseOffset = originalOffset; }
                 }
             }
 
@@ -366,7 +366,7 @@ namespace Heelz
 
                 if (parent != null) {
                     NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
-                    agent.baseOffset = originalOffset + currentConfig.rootMove.y;
+                    if (agent != null) { agent.baseOffset = originalOffset + currentConfig.rootMove.y; }
                 }
             }
 
