@@ -323,7 +323,7 @@ namespace Heelz
 
             public HeelConfig currentConfig;
             private bool onGroundAnim = false;
-            private readonly float originalOffset = 0; // it's fixed value. 
+            private readonly float originalOffset = 0.5f; // it's fixed value. 
             private Dictionary<Transform, Vector3[]> transformVectors = new Dictionary<Transform, Vector3[]>();
             private Dictionary<Transform, bool> parentDerivation = new Dictionary<Transform, bool>();
 
@@ -342,6 +342,7 @@ namespace Heelz
                     RemoveLocalTransforms();
                     Log("Found! Setting up Transforms..");
                     LocalTransforms(shoeConfig);
+                    EnableHover();
                 } else {
                     Log("Not Found! Removing Transforms..");
                     RemoveLocalTransforms();
@@ -397,8 +398,6 @@ namespace Heelz
             {
                 if (ChaControl == null) return;
                 currentConfig = heelConfig;
-                // TODO: keep old value or calculate ABM or character value.
-                EnableHover();
 
                 foreach (KeyValuePair<string, string> pair in pathMaps)
                 {
