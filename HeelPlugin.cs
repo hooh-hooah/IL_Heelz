@@ -238,7 +238,6 @@ namespace Heelz
         public static bool isElevated = true;
         public static bool isChanging = false;
         public static Vector3 savedOffset = Vector3.zero;
-        public static Vector3[] savedPositions = new Vector3[4]; // Hscene.cs:395, 397 - Scene has 4 character limit.
         public static ChaControl[] savedControls = new ChaControl[4];
 
         [HarmonyPostfix, HarmonyPatch(typeof(HScene), nameof(HScene.ChangeAnimation))]
@@ -254,11 +253,6 @@ namespace Heelz
             {
                 isChanging = true;
                 savedOffset = mainCharController.currentConfig.rootMove;
-
-                if (chaFemales[0] != null && savedPositions[0] == Vector3.zero) savedPositions[0] = chaFemales[0].transform.position;
-                if (chaFemales[1] != null && savedPositions[1] == Vector3.zero) savedPositions[1] = chaFemales[1].transform.position;
-                if (chaMales[0] != null && savedPositions[2] == Vector3.zero) savedPositions[2] = chaMales[0].transform.position;
-                if (chaMales[1] != null && savedPositions[3] == Vector3.zero) savedPositions[3] = chaMales[1].transform.position;
 
                 if (whitelist.ContainsKey(_info.assetpathFemale) && whitelist[_info.assetpathFemale] != null) {
                     Dictionary<int, bool> idDict = whitelist[_info.assetpathFemale];
@@ -282,20 +276,20 @@ namespace Heelz
 
             if (isChanging && !hscene.NowChangeAnim)
             {
-                if (isElevated)
-                {
-                    if (savedControls[0] != null) savedControls[0].transform.position = savedPositions[0];
-                    if (savedControls[1] != null) savedControls[1].transform.position = savedPositions[1]; // if it has heels then nut and go
-                    if (savedControls[2] != null) savedControls[2].transform.position = savedPositions[2] - savedOffset; // male does not have heels
-                    if (savedControls[3] != null) savedControls[3].transform.position = savedPositions[3] - savedOffset; // male does not have heels
-                }
-                else
-                {
-                    if (savedControls[0] != null) savedControls[0].transform.position = savedPositions[0] - savedOffset;
-                    if (savedControls[1] != null) savedControls[1].transform.position = savedPositions[1] - savedOffset; // if it has heels then nut and go.
-                    if (savedControls[2] != null) savedControls[2].transform.position = savedPositions[2] - savedOffset;
-                    if (savedControls[3] != null) savedControls[3].transform.position = savedPositions[3] - savedOffset;
-                }
+                // if (isElevated)
+                // {
+                //     if (savedControls[0] != null) savedControls[0].transform.Find("BodyTop").localPosition = -savedOffset*0f;
+                //     if (savedControls[1] != null) savedControls[1].transform.Find("BodyTop").localPosition = -savedOffset*0f; // if it has heels then nut and go
+                //     if (savedControls[2] != null) savedControls[2].transform.Find("BodyTop").localPosition = -savedOffset*0f; // male does not have heels
+                //     if (savedControls[3] != null) savedControls[3].transform.Find("BodyTop").localPosition = -savedOffset*0f; // male does not have heels
+                // }
+                // else
+                // {
+                //     if (savedControls[0] != null) savedControls[0].transform.Find("BodyTop").localPosition = -savedOffset*0f;
+                //     if (savedControls[1] != null) savedControls[1].transform.Find("BodyTop").localPosition = -savedOffset*0f; // if it has heels then nut and go.
+                //     if (savedControls[2] != null) savedControls[2].transform.Find("BodyTop").localPosition = -savedOffset*0f;
+                //     if (savedControls[3] != null) savedControls[3].transform.Find("BodyTop").localPosition = -savedOffset*0f;
+                // }
 
                 isChanging = false;
             }
@@ -305,8 +299,6 @@ namespace Heelz
         public static void EndProc(HScene __instance)
         {
             savedOffset = Vector3.zero;
-            for (int i = 0; i < savedPositions.Length; i++)
-                savedPositions[i] = Vector3.zero;
             for (int i = 0; i< savedControls.Length; i++)
                 savedControls[i] = null;
         }
@@ -425,6 +417,7 @@ namespace Heelz
                             parentDerivation.Add(thatShit, parentDerive);
                     }
                 }
+
 
                 IKSolverFullBodyBiped ik = ChaControl.fullBodyIK.solver;
                 ik.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(ik.OnPostUpdate, new IKSolver.UpdateDelegate(this.IKArray));
