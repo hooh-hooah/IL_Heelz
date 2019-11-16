@@ -16,9 +16,11 @@ using UnityEngine.AI;
 using System.Text;
 using System.Xml;
 using System.IO;
+using Studio;
 
 namespace Heelz
 {
+
     public class HeelConfig
     {
         public Vector3 rootMove;
@@ -303,6 +305,22 @@ namespace Heelz
                 savedControls[i] = null;
         }
 
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), "LateUpdateForce")]
+        public static void LateUpdateForce(ChaControl __instance)
+        {
+            if (!__instance.fullBodyIK.isActiveAndEnabled)
+            {
+                Animator anim = __instance?.transform?.Find("BodyTop/p_cf_anim").GetComponent<Animator>();
+                anim.Update(0f);
+                GetAPIController(__instance)?.IKArray();
+            }
+        }
+
+        private static bool isStudio()
+        {
+            return (Application.productName == "StudioNEOV2");
+        }
+
         // add when clothes status has been changed ingame.
 
         private static HeelsController GetAPIController(ChaControl character) => character?.gameObject?.GetComponent<HeelsController>();
@@ -326,7 +344,7 @@ namespace Heelz
                 int shoeID = ChaControl.nowCoordinate.clothes.parts[7].id;
                 GameObject shoeGameObject = ChaControl.objClothes[7];
                 HeelConfig shoeConfig;
-
+                
                 Log(String.Format("Looking for ID: \"{0}\"", shoeID));
                 if (heelConfigs.TryGetValue(shoeID, out shoeConfig) && shoeConfig.loaded == true)
                 {
@@ -418,7 +436,6 @@ namespace Heelz
                     }
                 }
 
-
                 IKSolverFullBodyBiped ik = ChaControl.fullBodyIK.solver;
                 ik.OnPostUpdate = (IKSolver.UpdateDelegate)Delegate.Combine(ik.OnPostUpdate, new IKSolver.UpdateDelegate(this.IKArray));
             }
@@ -440,17 +457,19 @@ namespace Heelz
                     if (macros.Value[3] != Vector3.zero || macros.Value[4] != Vector3.zero)
                     {
                         if (macros.Value[3] != Vector3.zero)
-                            targetTransform.localEulerAngles = new Vector3(
-                                Math.Max(macros.Value[3].x, targetTransform.localEulerAngles.x),
-                                Math.Max(macros.Value[3].y, targetTransform.localEulerAngles.y),
-                                Math.Max(macros.Value[3].z, targetTransform.localEulerAngles.z)
-                            );
+                            targetTransform.localEulerAngles = targetTransform.localEulerAngles;
+                            //targetTransform.localEulerAngles = new Vector3(
+                            //    Math.Max(macros.Value[3].x, targetTransform.localEulerAngles.x),
+                            //    Math.Max(macros.Value[3].y, targetTransform.localEulerAngles.y),
+                            //    Math.Max(macros.Value[3].z, targetTransform.localEulerAngles.z)
+                            //);
                         if (macros.Value[4] != Vector3.zero)
-                            targetTransform.localEulerAngles = new Vector3(
-                                Math.Min(macros.Value[4].x, targetTransform.localEulerAngles.x),
-                                Math.Min(macros.Value[4].y, targetTransform.localEulerAngles.y),
-                                Math.Min(macros.Value[4].z, targetTransform.localEulerAngles.z)
-                            );
+                            targetTransform.localEulerAngles = targetTransform.localEulerAngles;
+                            //targetTransform.localEulerAngles = new Vector3(
+                            //    Math.Min(macros.Value[4].x, targetTransform.localEulerAngles.x),
+                            //    Math.Min(macros.Value[4].y, targetTransform.localEulerAngles.y),
+                            //    Math.Min(macros.Value[4].z, targetTransform.localEulerAngles.z)
+                            //);
                     }
                 }
             }
