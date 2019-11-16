@@ -34,7 +34,7 @@ namespace Heelz
     public partial class HeelPlugin : BaseUnityPlugin
     {
         public const string GUID = "com.hooh.heelz";
-        public const string VERSION = "1.0.3";
+        public const string VERSION = "1.1.0";
         public static Dictionary<int, HeelConfig> heelConfigs = new Dictionary<int, HeelConfig>();
         public static String[] parts = { "foot01", "foot02", "toes01" };
         public static String[] modifiers = { "move", "roll", "scale" };
