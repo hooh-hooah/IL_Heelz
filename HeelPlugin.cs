@@ -201,11 +201,6 @@ namespace Heelz {
             }
         }
 
-        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
-        public static void ChangeCustomClothes(ChaControl __instance, int kind) {
-            if (kind == 7)
-                GetAPIController(__instance)?.SetUpShoes();
-        }
 
         public static Dictionary<string, Dictionary<int, bool>> whitelist = new Dictionary<string, Dictionary<int, bool>>()
         {
@@ -285,6 +280,27 @@ namespace Heelz {
                 savedControls[i] = null;
         }
 
+        /*
+         *  CLOTHES RELATED INTERACTIONS 
+         */
+
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
+        public static void ChangeCustomClothes(ChaControl __instance, int kind) {
+            if (kind == 7)
+                GetAPIController(__instance)?.SetUpShoes();
+        }
+
+        [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
+        public static void SetClothesState(ChaControl __instance, int clothesKind, byte state, bool next = true) {
+            if (clothesKind == 7)
+                GetAPIController(__instance)?.UpdateHover();
+        }
+
+        /*
+         *  Heels Related Functions
+         */
+
+        // This is mostly for Studio. But in case fullBodyIK is not working, something gotta work really hard.
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), "LateUpdateForce")]
         public static void LateUpdateForce(ChaControl __instance) {
             if (!__instance.fullBodyIK.isActiveAndEnabled) {
@@ -292,12 +308,6 @@ namespace Heelz {
                 GetAPIController(__instance)?.IKArray();
             }
         }
-
-        private static bool isStudio() {
-            return (Application.productName == "StudioNEOV2");
-        }
-
-        // add when clothes status has been changed ingame.
 
         private static HeelsController GetAPIController(ChaControl character) => character?.gameObject?.GetComponent<HeelsController>();
 
@@ -310,7 +320,7 @@ namespace Heelz {
 
             public HeelConfig currentConfig;
             private bool onGroundAnim = false;
-            private readonly float originalOffset = 0.5f; // it's fixed value.
+            private readonly float originalOffset = 0.5f; // it's fixed value. I guess. yeah. probably?
             private Dictionary<Transform, Vector3[]> transformVectors = new Dictionary<Transform, Vector3[]>();
             private Dictionary<Transform, bool> parentDerivation = new Dictionary<Transform, bool>();
             private GameObject shoeGameObject;
@@ -336,7 +346,6 @@ namespace Heelz {
                 }
             }
 
-            // You can't fly while sitting around or having a sex you moron
             public void DisableHover() {
                 Transform parent = ChaControl?.gameObject?.transform?.parent;
 
@@ -348,7 +357,6 @@ namespace Heelz {
                 }
             }
 
-            // start flying again cuz you're not getting laid
             public void EnableHover() {
                 Transform parent = ChaControl?.gameObject?.transform?.parent;
 
@@ -360,8 +368,8 @@ namespace Heelz {
                 }
             }
 
-            public void UpdateHover() {
-                if (onGroundAnim)
+            public void UpdateHover() { 
+                if (!shoeGameObject.activeInHierarchy || onGroundAnim)
                     DisableHover();
                 else
                     EnableHover();
