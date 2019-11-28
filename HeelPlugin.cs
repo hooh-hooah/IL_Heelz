@@ -311,7 +311,7 @@ namespace Heelz
             if (!__instance.fullBodyIK.isActiveAndEnabled)
             {
                 Animator anim = __instance?.transform?.Find("BodyTop/p_cf_anim").GetComponent<Animator>();
-                anim.Update(0f);
+                //anim.Update(0f);
                 GetAPIController(__instance)?.IKArray();
             }
         }
