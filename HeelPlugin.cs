@@ -64,8 +64,8 @@ namespace Heelz {
 
         private void Start() {
             Logger = base.Logger;
-            isVerbose = Config.Wrap<bool>("Heelz", "Heelz Verbose Mode", "Heelz Verbose Mode", false);
-            loadDevXML = Config.Wrap<bool>("Heelz", "Load Developer XML", "Load Developer XML", false);
+            isVerbose = Config.Wrap("Heelz", "Heelz Verbose Mode", "Heelz Verbose Mode", false);
+            loadDevXML = Config.Wrap("Heelz", "Load Developer XML", "Load Developer XML", false);
             CharacterApi.RegisterExtraBehaviour<HeelsController>(GUID);
             HarmonyWrapper.PatchAll(typeof(HeelPlugin));
 
@@ -295,10 +295,6 @@ namespace Heelz {
             if (clothesKind == 7)
                 GetAPIController(__instance)?.UpdateHover();
         }
-
-        /*
-         *  Heels Related Functions
-         */
 
         // This is mostly for Studio. But in case fullBodyIK is not working, something gotta work really hard.
         [HarmonyPostfix, HarmonyPatch(typeof(ChaControl), "LateUpdateForce")]
