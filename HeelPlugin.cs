@@ -47,35 +47,37 @@ namespace Heelz {
             {kosiString + "cf_J_LegUp00_R/cf_J_LegLow01_R/cf_J_LegLowRoll_R/cf_J_Foot01_R/cf_J_Foot02_R/cf_J_Toes01_R", "toes01"},
         };
 
-        public static ConfigWrapper<bool> isVerbose {
+        public static ConfigEntry<bool> IsVerbose {
             get; private set;
         }
 
-        public static ConfigWrapper<bool> loadDevXML {
+        public static ConfigEntry<bool> LoadDevXML {
             get; private set;
         }
 
         internal static new ManualLogSource Logger;
 
         private static void Log(string str) {
-            if (isVerbose.Value)
+            if (IsVerbose.Value)
                 Logger.LogDebug(str);
         }
 
         private void Start() {
             Logger = base.Logger;
-            isVerbose = Config.Wrap("Heelz", "Heelz Verbose Mode", "Heelz Verbose Mode", false);
-            loadDevXML = Config.Wrap("Heelz", "Load Developer XML", "Load Developer XML", false);
+            IsVerbose = Config.Bind("Heelz", "Heelz Verbose Mode", false,
+                                    new ConfigDescription("Make Heelz Plugin print all of debug messages in console. Useless for most of users."));
+            LoadDevXML = Config.Bind("Heelz", "Load Developer XML", false,
+                                     new ConfigDescription("Make Heelz Plugin load heel_manifest.xml file from game root folder. Useful for developing heels. Useless for most of users."));
             CharacterApi.RegisterExtraBehaviour<HeelsController>(GUID);
             HarmonyWrapper.PatchAll(typeof(HeelPlugin));
 
-            Logger.LogInfo("[heelz] Heels mode activated: destroy all foot");
-            var loadedManifests = Sideloader.Sideloader.LoadedManifests;
+            Logger.LogInfo("[Heelz] Heels mode activated: destroy all foot");
+            var loadedManifests = Sideloader.Sideloader.Manifests.Values;
             foreach (var manifest in loadedManifests) {
                 LoadXML(manifest.manifestDocument);
             }
 
-            if (loadDevXML.Value) {
+            if (LoadDevXML.Value) {
                 try {
                     string rootPath = Directory.GetParent(Application.dataPath).ToString();
                     string devXMLPath = rootPath + "/heel_manifest.xml";
@@ -194,7 +196,7 @@ namespace Heelz {
                             }
 
                             heelConfigs.Add(heelID, newConfig);
-                            Log(String.Format("Registered new heel config for follwing ID: \"{0}\"", heelID));
+                            Log(String.Format("Registered new heel ID: \"{0}\"", heelID));
                         } catch (Exception e) { Log(e.ToString()); }
                     }
                 }
@@ -356,7 +358,7 @@ namespace Heelz {
             public void EnableHover() {
                 Transform parent = ChaControl?.gameObject?.transform?.parent;
 
-                if (parent != null) {
+                if (parent != null && currentConfig != null) {
                     NavMeshAgent agent = parent?.Find("Controller")?.GetComponent<NavMeshAgent>();
                     if (agent != null) {
                         agent.baseOffset = originalOffset + currentConfig.rootMove.y;
