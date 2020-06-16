@@ -99,6 +99,7 @@
   <PropertyGroup>
     <PostBuildEvent>
       copy /Y "$(TargetDir)$(ProjectName).dll" "D:\suqa\BepInEx\plugins\$(ProjectName).dll"
+      copy /Y "$(TargetDir)$(ProjectName).dll" "D:\Plugin Release Repository\Heelz\$(ProjectName).dll"
     </PostBuildEvent>
   </PropertyGroup>
 </Project>
