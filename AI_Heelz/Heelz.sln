@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29009.5
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI_Heelz", "AI_Heelz.csproj", "{95B23A3F-13E0-4D09-841E-BC16CE1DC897}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugin", "Plugin", "{27CE79DB-5140-4284-922C-00936A07363E}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "HeelzCore", "..\HeelzCore\HeelzCore.shproj", "{E4151AA3-28D1-4DF6-A8B8-DC05FA4FAA25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HS2_Heelz", "..\HS2_Heelz\HS2_Heelz.csproj", "{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}"
+EndProject
+Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\HeelzCore\HeelzCore.projitems*{1ce2fcfe-d2cb-4bfd-821f-9655a5447e66}*SharedItemsImports = 4
+		..\HeelzCore\HeelzCore.projitems*{95b23a3f-13e0-4d09-841e-bc16ce1dc897}*SharedItemsImports = 4
+		..\HeelzCore\HeelzCore.projitems*{e4151aa3-28d1-4df6-a8b8-dc05fa4faa25}*SharedItemsImports = 13
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{95B23A3F-13E0-4D09-841E-BC16CE1DC897} = {27CE79DB-5140-4284-922C-00936A07363E}
+		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66} = {27CE79DB-5140-4284-922C-00936A07363E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C19DB3D-5656-48D8-8BE8-F3FEC1CBC707}
+	EndGlobalSection
+EndGlobal

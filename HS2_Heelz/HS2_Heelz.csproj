@@ -1,0 +1,104 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HS2_Heelz</RootNamespace>
+    <AssemblyName>HS2_Heelz</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>hooh_HS2Heelz.snk</AssemblyOriginatorKeyFile>
+    <PublicSign>true</PublicSign>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;HS2</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="HSHeelz.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="hooh_HS2Heelz.snk" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.0.0-beta2\lib\net35\0Harmony.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionLibs.HoneySelect2.Assembly-CSharp.2020.5.29\lib\net46\Assembly-CSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionLibs.HoneySelect2.Assembly-CSharp-firstpass.2020.5.29\lib\net35\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BepInEx, Version=5.0.1.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionLibs.BepInEx.5.0.1.1\lib\net35\BepInEx.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="BepInEx.Harmony, Version=2.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.0.0-beta2\lib\net35\BepInEx.Harmony.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HS2API, Version=1.12.2.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionModdingAPI.HS2API.1.12.2\lib\net46\HS2API.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="HS2_Sideloader, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\Sideloader.HoneySelect2.15.1.0\lib\net46\HS2_Sideloader.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib, Version=1.2.0.246, Culture=neutral, PublicKeyToken=1b03e6acf1164f73">
+      <HintPath>..\packages\SharpZipLib.1.2.0\lib\net45\ICSharpCode.SharpZipLib.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionLibs.HoneySelect2.UnityEngine.CoreModule.2018.4.11\lib\net46\UnityEngine.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\IllusionLibs.HoneySelect2.UnityEngine.CoreModule.2018.4.11\lib\net46\UnityEngine.CoreModule.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="XUnity.Common, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\XUnity.Common.1.0.0\lib\net35\XUnity.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="XUnity.ResourceRedirector, Version=1.1.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\packages\XUnity.ResourceRedirector.1.1.0\lib\net35\XUnity.ResourceRedirector.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+  </ItemGroup>
+  <Import Project="..\HeelzCore\HeelzCore.projitems" Label="Shared" />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+      copy /Y "$(TargetDir)$(ProjectName).dll" "D:\suqa\BepInEx\plugins\$(ProjectName).dll"
+    </PostBuildEvent>
+  </PropertyGroup>
+</Project>
