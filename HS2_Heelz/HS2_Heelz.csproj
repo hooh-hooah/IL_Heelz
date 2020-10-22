@@ -34,7 +34,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="HSHeelz.cs" />
+    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -94,12 +94,12 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <Import Project="..\HeelzCore\HeelzCore.projitems" Label="Shared" />
+  <Import Project="..\IL_Heelz\IL_Heelz.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-      copy /Y "$(TargetDir)$(ProjectName).dll" "D:\suqa\BepInEx\plugins\$(ProjectName).dll"
-      copy /Y "$(TargetDir)$(ProjectName).dll" "D:\Plugin Release Repository\Heelz\$(ProjectName).dll"
+      mkdir "$(TargetDir)final"
+      copy /Y "$(TargetDir)$(AssemblyName).dll" "$(TargetDir)final\$(ProjectName).dll"
     </PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -12,4 +12,4 @@ using Heelz;
 [assembly: AssemblyCulture("")]
 [assembly: ComVisible(false)]
 [assembly: Guid("95b23a3f-13e0-4d09-841e-bc16ce1dc897")]
-[assembly: AssemblyVersion(AIHeelz.VERSION)]
+[assembly: AssemblyVersion(Constant.VERSION)]

@@ -11,12 +11,8 @@
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)Constant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HeelsContoller.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Util.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Common.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Values.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)XMLLoader.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)hooh_COMHeelz.snk" />
   </ItemGroup>
 </Project>

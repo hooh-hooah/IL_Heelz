@@ -4,13 +4,14 @@
     <ProjectGuid>e4151aa3-28d1-4df6-a8b8-dc05fa4faa25</ProjectGuid>
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>hooh_COMHeelz.snk</AssemblyOriginatorKeyFile>
     <PublicSign>true</PublicSign>
+    <AssemblyName></AssemblyName>
+    <RootNamespace>IL_Heelz</RootNamespace>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.Common.Default.props" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.Common.props" />
   <PropertyGroup />
-  <Import Project="HeelzCore.projitems" Label="Shared" />
+  <Import Project="IL_Heelz.projitems" Label="Shared" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.CSharp.targets" />
 </Project>

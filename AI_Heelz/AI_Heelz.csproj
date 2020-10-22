@@ -98,14 +98,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AIHeelz.cs" />
+    <Compile Include="Plugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="hooh_AIHeelz.snk" />
     <None Include="packages.config" />
   </ItemGroup>
-  <Import Project="..\HeelzCore\HeelzCore.projitems" Label="Shared" />
+  <Import Project="..\IL_Heelz\IL_Heelz.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
@@ -113,8 +113,9 @@
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
-      copy /Y "$(TargetDir)$(ProjectName).dll" "D:\AI-Syoujyo\BepInEx\plugins\$(ProjectName).dll"
-      copy /Y "$(TargetDir)$(ProjectName).dll" "D:\Plugin Release Repository\Heelz\$(ProjectName).dll"
+      mkdir "$(TargetDir)final"
+      copy /Y "$(TargetDir)$(AssemblyName).dll" "$(TargetDir)final\$(ProjectName).dll"
+      copy /Y "$(TargetDir)$(AssemblyName).dll" "$(AIPath)$(ProjectName).dll"
     </PostBuildEvent>
   </PropertyGroup>
 </Project>
