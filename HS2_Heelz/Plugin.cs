@@ -64,7 +64,6 @@ namespace Heelz
         // ReSharper disable once UnusedMember.Global InconsistentNaming
         public static void SetClothesState(ChaControl __instance, int clothesKind, byte state, bool next = true)
         {
-            // What the fuck? somehow set clothes state getting called every single frame?
             if (clothesKind == Constant.ShoeCategory) GetAPIController(__instance)?.UpdateHover();
         }
 
@@ -74,7 +73,6 @@ namespace Heelz
         {
             var heelsController = GetAPIController(__instance);
             if (heelsController == null) return;
-            heelsController.UpdateHover();
             if (!__instance.fullBodyIK.isActiveAndEnabled) heelsController.IKArray();
         }
 
