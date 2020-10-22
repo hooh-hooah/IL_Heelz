@@ -115,7 +115,6 @@
     <PostBuildEvent>
       mkdir "$(TargetDir)final"
       copy /Y "$(TargetDir)$(AssemblyName).dll" "$(TargetDir)final\$(ProjectName).dll"
-      copy /Y "$(TargetDir)$(AssemblyName).dll" "$(AIPath)$(ProjectName).dll"
     </PostBuildEvent>
   </PropertyGroup>
 </Project>
