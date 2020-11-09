@@ -9,6 +9,7 @@
     <Import_RootNamespace>HeelzCore</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)Config.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Constant.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)HeelsContoller.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
