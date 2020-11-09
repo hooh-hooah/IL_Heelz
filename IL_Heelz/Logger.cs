@@ -8,6 +8,7 @@ namespace Util
 
         internal static void Log(object message)
         {
+            if (!ConfigUtility.CanLog) return;
             logSource.LogDebug(message);
         }
     }

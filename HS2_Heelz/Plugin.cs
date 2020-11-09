@@ -13,14 +13,13 @@ namespace Heelz
     public class HeelzPlugin : BaseUnityPlugin
     {
         private static ManualLogSource _logger;
-        private static ConfigEntry<bool> LoadDevXML { get; set; }
+        public static ConfigEntry<bool> LoadDevXML { get; set; }
+        public static ConfigEntry<bool> VerboseMode { get; set; }
 
         private void Start()
         {
             _logger = Logger;
             Util.Logger.logSource = _logger;
-            LoadDevXML = Config.Bind("Heelz", "Load Developer XML", false,
-                new ConfigDescription("Make Heelz Plugin load heel_manifest.xml file from game root folder. Useful for developing heels. Useless for most of users."));
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
             HarmonyWrapper.PatchAll(typeof(HeelzPlugin));
             _logger.LogInfo("[Heelz] Heels mode activated: destroy all foot");

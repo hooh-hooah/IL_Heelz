@@ -6,6 +6,7 @@ using BepInEx.Harmony;
 using BepInEx.Logging;
 using HarmonyLib;
 using KKAPI.Chara;
+using Util;
 
 namespace Heelz
 {
@@ -14,14 +15,14 @@ namespace Heelz
     public class HeelzPlugin : BaseUnityPlugin
     {
         internal new static ManualLogSource Logger;
-        public static ConfigEntry<bool> LoadDevXML { get; private set; }
+        public static ConfigEntry<bool> LoadDevXML { get; set; }
+        public static ConfigEntry<bool> VerboseMode { get; set; }
 
         private void Start()
         {
+            ConfigUtility.Initialize(Config);
             Logger = base.Logger;
             Util.Logger.logSource = Logger;
-            LoadDevXML = Config.Bind("Heelz", "Load Developer XML", false,
-                new ConfigDescription("Make Heelz Plugin load heel_manifest.xml file from game root folder. Useful for developing heels. Useless for most of users."));
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
             HarmonyWrapper.PatchAll(typeof(HeelzPlugin));
             Logger.LogInfo("[Heelz] Heels mode activated: destroy all foot");
