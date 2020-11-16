@@ -14,15 +14,13 @@ namespace Heelz
     [BepInDependency(Sideloader.Sideloader.GUID)]
     public class HeelzPlugin : BaseUnityPlugin
     {
-        internal new static ManualLogSource Logger;
         public static ConfigEntry<bool> LoadDevXML { get; set; }
         public static ConfigEntry<bool> VerboseMode { get; set; }
 
         private void Start()
         {
-            ConfigUtility.Initialize(Config);
-            Logger = base.Logger;
             Util.Logger.logSource = Logger;
+            ConfigUtility.Initialize(Config);
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
             HarmonyWrapper.PatchAll(typeof(HeelzPlugin));
             Logger.LogInfo("[Heelz] Heels mode activated: destroy all foot");

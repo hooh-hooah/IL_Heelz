@@ -5,6 +5,7 @@ using BepInEx.Harmony;
 using BepInEx.Logging;
 using HarmonyLib;
 using KKAPI.Chara;
+using Util;
 
 namespace Heelz
 {
@@ -12,17 +13,16 @@ namespace Heelz
     [BepInDependency(Sideloader.Sideloader.GUID)]
     public class HeelzPlugin : BaseUnityPlugin
     {
-        private static ManualLogSource _logger;
         public static ConfigEntry<bool> LoadDevXML { get; set; }
         public static ConfigEntry<bool> VerboseMode { get; set; }
 
         private void Start()
         {
-            _logger = Logger;
-            Util.Logger.logSource = _logger;
+            Util.Logger.logSource = Logger;
+            ConfigUtility.Initialize(Config);
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
             HarmonyWrapper.PatchAll(typeof(HeelzPlugin));
-            _logger.LogInfo("[Heelz] Heels mode activated: destroy all foot");
+            Logger.LogInfo("[Heelz] Heels mode activated: destroy all foot");
             var loadedManifests = Sideloader.Sideloader.Manifests.Values;
             foreach (var manifest in loadedManifests) XMLLoader.LoadXML(manifest.manifestDocument);
             if (LoadDevXML.Value) XMLLoader.StartWatchDevXML();
