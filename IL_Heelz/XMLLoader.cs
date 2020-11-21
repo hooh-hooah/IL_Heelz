@@ -74,10 +74,10 @@ public static class XMLLoader
         {
             var heelID = int.Parse(element.Attribute("id")?.Value);
             Logger.Log($"Registering Heel Config for clothe ID: {heelID}");
-            
+
             if (heelID <= -1) continue;
             var newConfig = new HeelConfig();
-            
+
             Logger.Log("Finding sideloader reference");
             var resolvedID = UniversalAutoResolver.TryGetResolutionInfo(heelID, "ChaFileClothes.ClothesShoes", guid);
             if (resolvedID != null)
@@ -86,16 +86,18 @@ public static class XMLLoader
                 heelID = resolvedID.LocalSlot;
             }
             else
-            { 
+            {
+                // Due to some limitation, I'm limiting heels registration to the sideloader items. 
                 Logger.Log($"Unable to resolve ID: {heelID}.");
+                return;
             }
-                
+
             if (Values.Configs.ContainsKey(heelID))
             {
                 Logger.Log($"CONFLICTING HEEL DATA! Shoe ID {heelID} already has heel data.");
                 return;
             }
-            
+
             try
             {
                 foreach (var partKey in Constant.parts)
@@ -128,12 +130,12 @@ public static class XMLLoader
                         Logger.Log($"\t{partKey}_{modKey}: {vectors[modKey].ToString()}");
 
                         if (modKey != "roll") continue;
-                        
+
                         var min = partElement.Element(modKey)?.Attribute("min")?.Value
                             ?.Split(',');
                         var max = partElement.Element(modKey)?.Attribute("max")?.Value
                             ?.Split(',');
-                        
+
                         if (min != null)
                         {
                             vectors.Add(modKey + "min",
@@ -169,8 +171,15 @@ public static class XMLLoader
 
                 newConfig.loaded = true;
 
-                Values.Configs.Add(heelID, newConfig);
-                Logger.Log($"Registered new heel ID: \"{heelID}\"");
+                if (heelID <= 0)
+                {
+                    Logger.Log($"Heelz refused to register heel ID: \"{heelID}\"");
+                }
+                else
+                {
+                    Values.Configs.Add(heelID, newConfig);
+                    Logger.Log($"Registered new heel ID: \"{heelID}\"");
+                }
             }
             catch (Exception e)
             {
