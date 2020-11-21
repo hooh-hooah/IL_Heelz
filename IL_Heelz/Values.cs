@@ -9,7 +9,7 @@ public class HeelConfig
     public Vector3 rootMove;
 }
 
-public class Values
+public static class Values
 {
     public static readonly Dictionary<int, HeelConfig> Configs = new Dictionary<int, HeelConfig>();
 }

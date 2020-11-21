@@ -22,7 +22,7 @@ public static class Constant
     public const string NAME = "Heelz";
     public static List<int> StandingAnimations = new List<int>();
 
-    public const string VERSION = "1.14.2";
+    public const string VERSION = "1.14.3";
     public static string[] parts = {"foot01", "foot02", "toes01"};
     public static string[] modifiers = {"move", "roll", "scale"};
     public const int ShoeCategory = 7;

@@ -30,7 +30,6 @@ public static class XMLLoader
             }
 
             fsWatcher.Changed += EventHandler;
-
             fsWatcher.EnableRaisingEvents = true;
         }
         catch (Exception e)
@@ -70,19 +69,33 @@ public static class XMLLoader
         var heelData = manifestDocument?.Root?.Element("AI_HeelsData")?.Elements("heel");
         var guid = manifestDocument?.Root?.Element("guid")?.Value;
         if (heelData == null) return;
+        Logger.Log($"Registering Heelz Data for \"{guid}\"");
         foreach (var element in heelData)
         {
             var heelID = int.Parse(element.Attribute("id")?.Value);
+            Logger.Log($"Registering Heel Config for clothe ID: {heelID}");
+            
+            if (heelID <= -1) continue;
+            var newConfig = new HeelConfig();
+            
+            Logger.Log("Finding sideloader reference");
+            var resolvedID = UniversalAutoResolver.TryGetResolutionInfo(heelID, "ChaFileClothes.ClothesShoes", guid);
+            if (resolvedID != null)
+            {
+                Logger.Log($"Found Resolved ID: \"{heelID}\"=>\"{resolvedID.LocalSlot}\"");
+                heelID = resolvedID.LocalSlot;
+            }
+            else
+            { 
+                Logger.Log($"Unable to resolve ID: {heelID}.");
+            }
+                
             if (Values.Configs.ContainsKey(heelID))
             {
                 Logger.Log($"CONFLICTING HEEL DATA! Shoe ID {heelID} already has heel data.");
                 return;
             }
-
-            Logger.Log($"Registering Heel Config for clothe ID: {heelID}");
-            if (heelID <= -1) continue;
-            var newConfig = new HeelConfig();
-
+            
             try
             {
                 foreach (var partKey in Constant.parts)
@@ -155,14 +168,6 @@ public static class XMLLoader
                     newConfig.rootMove = Vector3.zero;
 
                 newConfig.loaded = true;
-
-                var resolvedID =
-                    UniversalAutoResolver.TryGetResolutionInfo(heelID, "ChaFileClothes.ClothesShoes", guid);
-                if (resolvedID != null)
-                {
-                    Logger.Log($"Found Resolved ID: \"{heelID}\"=>\"{resolvedID.LocalSlot}\"");
-                    heelID = resolvedID.LocalSlot;
-                }
 
                 Values.Configs.Add(heelID, newConfig);
                 Logger.Log($"Registered new heel ID: \"{heelID}\"");
