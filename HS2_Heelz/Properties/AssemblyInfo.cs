@@ -1,6 +1,5 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using Heelz;
 
 [assembly: AssemblyTitle("Heelz")]
 [assembly: AssemblyDescription("High heels plugin for Honey Select 2")]

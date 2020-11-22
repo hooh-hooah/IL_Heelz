@@ -2,8 +2,8 @@
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Harmony;
-using BepInEx.Logging;
 using HarmonyLib;
+using Heels.Controller;
 using KKAPI.Chara;
 using Util;
 
@@ -18,7 +18,7 @@ namespace Heelz
 
         private void Start()
         {
-            Util.Logger.logSource = Logger;
+            Util.Log.Logger.logSource = Logger;
             ConfigUtility.Initialize(Config);
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
             HarmonyWrapper.PatchAll(typeof(HeelzPlugin));
@@ -55,7 +55,7 @@ namespace Heelz
         // ReSharper disable once UnusedMember.Global InconsistentNaming
         public static void ChangeCustomClothes(ChaControl __instance, int kind)
         {
-            if (kind == 7) GetAPIController(__instance)?.SetUpShoes();
+            if (kind == 7) GetAPIController(__instance)?.ApplyHeelsData();
         }
 
         [HarmonyPostfix]
@@ -72,7 +72,7 @@ namespace Heelz
         {
             var heelsController = GetAPIController(__instance);
             if (heelsController == null) return;
-            if (!__instance.fullBodyIK.isActiveAndEnabled) heelsController.IKArray();
+            if (!__instance.fullBodyIK.isActiveAndEnabled) heelsController.Handler.UpdateFootAngle();
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter

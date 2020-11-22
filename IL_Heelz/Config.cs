@@ -5,6 +5,8 @@ namespace Util
 {
     public static class ConfigUtility
     {
+        public static bool CanLog => HeelzPlugin.VerboseMode.Value;
+
         public static void Initialize(ConfigFile Config)
         {
             HeelzPlugin.LoadDevXML = Config.Bind("Heelz", "Load Developer XML", false,
@@ -12,7 +14,5 @@ namespace Util
             HeelzPlugin.VerboseMode = Config.Bind("Heelz", "Verbose Mode", false,
                 new ConfigDescription("Print Everything"));
         }
-
-        public static bool CanLog => HeelzPlugin.VerboseMode.Value;
     }
 }

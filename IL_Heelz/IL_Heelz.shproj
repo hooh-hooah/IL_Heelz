@@ -6,7 +6,7 @@
     <SignAssembly>true</SignAssembly>
     <PublicSign>true</PublicSign>
     <AssemblyName></AssemblyName>
-    <RootNamespace>IL_Heelz</RootNamespace>
+    <RootNamespace>Heels</RootNamespace>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\CodeSharing\Microsoft.CodeSharing.Common.Default.props" />

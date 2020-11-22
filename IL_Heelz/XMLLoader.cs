@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Xml;
 using System.Xml.Linq;
+using Heels;
+using Heels.Struct;
 using Sideloader.AutoResolver;
 using UnityEngine;
-using Logger = Util.Logger;
+using Logger = Util.Log.Logger;
 
 public static class XMLLoader
 {
@@ -72,11 +73,10 @@ public static class XMLLoader
         Logger.Log($"Registering Heelz Data for \"{guid}\"");
         foreach (var element in heelData)
         {
-            var heelID = int.Parse(element.Attribute("id")?.Value);
+            var heelID = int.Parse(element.Attribute("id")?.Value ?? "-1");
             Logger.Log($"Registering Heel Config for clothe ID: {heelID}");
 
             if (heelID <= -1) continue;
-            var newConfig = new HeelConfig();
 
             Logger.Log("Finding sideloader reference");
             var resolvedID = UniversalAutoResolver.TryGetResolutionInfo(heelID, "ChaFileClothes.ClothesShoes", guid);
@@ -100,76 +100,7 @@ public static class XMLLoader
 
             try
             {
-                foreach (var partKey in Constant.parts)
-                {
-                    var partElement = element.Element(partKey);
-                    if (partElement == null)
-                        continue;
-
-                    // register position values such as roll, move scale.
-                    // it will parse vec, min, max. but unfortunately, only "roll" will get the limitation feature.
-                    // since we can't just make limit of vector... it's not going to move in most of case
-                    var vectors = new Dictionary<string, Vector3>();
-                    foreach (var modKey in Constant.modifiers)
-                    {
-                        var split = partElement.Element(modKey)?.Attribute("vec")?.Value?.Split(',');
-                        if (split != null)
-                        {
-                            var vector = new Vector3(float.Parse(split[0]), float.Parse(split[1]),
-                                float.Parse(split[2]));
-                            vectors.Add(modKey, vector);
-                        }
-                        else
-                        {
-                            vectors.Add(modKey,
-                                modKey == "scale"
-                                    ? Vector3.one
-                                    : Vector3.zero); // Yeah.. if there is no scale, don't fuck it up.
-                        }
-
-                        Logger.Log($"\t{partKey}_{modKey}: {vectors[modKey].ToString()}");
-
-                        if (modKey != "roll") continue;
-
-                        var min = partElement.Element(modKey)?.Attribute("min")?.Value
-                            ?.Split(',');
-                        var max = partElement.Element(modKey)?.Attribute("max")?.Value
-                            ?.Split(',');
-
-                        if (min != null)
-                        {
-                            vectors.Add(modKey + "min",
-                                new Vector3(float.Parse(min[0]), float.Parse(min[1]),
-                                    float.Parse(min[2])));
-                            Logger.Log($"\t{partKey}_{modKey + "min"}: {vectors[modKey + "min"].ToString()}");
-                        }
-
-                        if (max != null)
-                        {
-                            vectors.Add(modKey + "max",
-                                new Vector3(float.Parse(max[0]), float.Parse(max[1]),
-                                    float.Parse(max[2])));
-                            Logger.Log($"\t{partKey}_{modKey + "max"}: {vectors[modKey + "max"].ToString()}");
-                        }
-                    }
-
-                    newConfig.heelVectors.Add(partKey, vectors);
-
-                    // register parent angle derivation.
-                    var isFixed = partElement?.Attribute("fixed")?.Value;
-                    if (isFixed == null) continue;
-                    newConfig.isFixed.Add(partKey, bool.Parse(isFixed));
-                    Logger.Log($"\t{partKey}_isFixed: {isFixed}");
-                }
-
-                var rootSplit = element.Element("root")?.Attribute("vec")?.Value?.Split(',');
-                if (rootSplit != null)
-                    newConfig.rootMove = new Vector3(float.Parse(rootSplit[0]), float.Parse(rootSplit[1]),
-                        float.Parse(rootSplit[2]));
-                else
-                    newConfig.rootMove = Vector3.zero;
-
-                newConfig.loaded = true;
+                var newConfig = new HeelsConfig(element);
 
                 if (heelID <= 0)
                 {

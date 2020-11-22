@@ -1,15 +1,10 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using Heels.Struct;
 
-public class HeelConfig
+namespace Heels
 {
-    public readonly Dictionary<string, Dictionary<string, Vector3>> heelVectors = new Dictionary<string, Dictionary<string, Vector3>>();
-    public readonly Dictionary<string, bool> isFixed = new Dictionary<string, bool>();
-    public bool loaded = false;
-    public Vector3 rootMove;
-}
-
-public static class Values
-{
-    public static readonly Dictionary<int, HeelConfig> Configs = new Dictionary<int, HeelConfig>();
+    public static class Values
+    {
+        public static readonly Dictionary<int, HeelsConfig> Configs = new Dictionary<int, HeelsConfig>();
+    }
 }
