@@ -27,7 +27,7 @@ namespace Heels.Controller
             if (ChaControl == null) return;
             var shoeID = ChaControl.nowCoordinate.clothes.parts[Constant.ShoeCategory].id;
 
-            Logger.Log($"Looking for ID: \"{shoeID}\"");
+            Debug.Log($"Looking for ID: \"{shoeID}\"");
             if (Values.Configs.TryGetValue(shoeID, out var shoeConfig))
                 Handler.SetConfig(shoeConfig);
             else
@@ -36,18 +36,22 @@ namespace Heels.Controller
 
         public void DisableHover()
         {
-            Handler.Hover(false);
+            Handler.HoverBody(false);
         }
 
         public void EnableHover()
         {
-            Handler.Hover(true);
+            Handler.HoverBody(true);
         }
-
 
         public void UpdateHover()
         {
             Handler.UpdateStatus();
+        }
+
+        public void UpdateAnimation(string animationName)
+        {
+            Handler.UpdateAnimation(animationName);
         }
     }
 }

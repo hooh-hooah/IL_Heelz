@@ -22,7 +22,4 @@
     <Compile Include="$(MSBuildThisFileDirectory)Heels\Structs\JointData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Heels\Structs\TransformData.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Heels\Handler.cs" />
-  </ItemGroup>
 </Project>

@@ -1,15 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32328.378
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI_Heelz", "AI_Heelz\AI_Heelz.csproj", "{95B23A3F-13E0-4D09-841E-BC16CE1DC897}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HS2_Heelz", "HS2_Heelz\HS2_Heelz.csproj", "{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projects", "Projects", "{B5B9FC03-E094-432F-9CD9-AC61927A67DD}"
-EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "IL_Heelz", "IL_Heelz\IL_Heelz.shproj", "{E4151AA3-28D1-4DF6-A8B8-DC05FA4FAA25}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HS2_Heelz", "HS2_Heelz\HS2_Heelz.csproj", "{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -23,9 +21,9 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Release|Any CPU.Build.0 = Release|Any CPU
-		{95B23A3F-13E0-4D09-841E-BC16CE1DC897}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -33,11 +31,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{95B23A3F-13E0-4D09-841E-BC16CE1DC897} = {B5B9FC03-E094-432F-9CD9-AC61927A67DD}
-		{1CE2FCFE-D2CB-4BFD-821F-9655A5447E66} = {B5B9FC03-E094-432F-9CD9-AC61927A67DD}
-		{E4151AA3-28D1-4DF6-A8B8-DC05FA4FAA25} = {B5B9FC03-E094-432F-9CD9-AC61927A67DD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {344345DB-79AE-4616-A096-B381AF81FEAD}

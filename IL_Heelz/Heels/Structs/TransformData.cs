@@ -1,4 +1,6 @@
 ﻿using CharaCustom;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Heels.Struct
@@ -12,6 +14,10 @@ namespace Heels.Struct
         private const string RightAnkle = KosiRoot + "/cf_J_LegUp00_R/cf_J_LegLow01_R/cf_J_LegLowRoll_R/cf_J_Foot01_R";
         private const string RightFoot = RightAnkle + "/cf_J_Foot02_R";
         private const string RightToes = RightFoot + "/cf_J_Toes01_R";
+        public const string LeftHandEffectorName = "f_t_arm_L";
+        public const string RightHandEffectorName = "f_t_arm_R";
+        private const string LeftFootEffectorName = "f_t_leg_L";
+        private const string RightFootEffectorName = "f_t_leg_R";
 
         public Transform LeftFoot01;
         public Vector3[] LeftFoot01Memory;
@@ -25,6 +31,22 @@ namespace Heels.Struct
         public Vector3[] RightFoot02Memory;
         public Transform RightToes01;
         public Vector3[] RightToes01Memory;
+        public Transform LeftHandEffector;
+        public Transform RightHandEffector;
+        public Transform LeftFootEffector;
+        public Transform RightFootEffector;
+#if HS2
+        public Illusion.Component.Correct.BaseData LeftHandBaseData;
+        public Illusion.Component.Correct.BaseData RightHandBaseData;
+        public Illusion.Component.Correct.BaseData LeftFootBaseData;
+        public Illusion.Component.Correct.BaseData RightFootBaseData;
+#else
+        public Correct.BaseData LeftHandBaseData;
+        public Correct.BaseData RightHandBaseData;
+        public Correct.BaseData LeftFootBaseData;
+        public Correct.BaseData RightFootBaseData;
+#endif
+
 
         private static Vector3[] zeroArray = {Vector3.zero, Vector3.zero, Vector3.one};
 
@@ -42,6 +64,22 @@ namespace Heels.Struct
             RightFoot01Memory = zeroArray;
             RightFoot02Memory = zeroArray;
             RightToes01Memory = zeroArray;
+            LeftHandEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(LeftHandEffectorName)).FirstOrDefault();
+            RightHandEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(RightHandEffectorName)).FirstOrDefault();
+            LeftFootEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(LeftFootEffectorName)).FirstOrDefault();
+            RightFootEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(RightFootEffectorName)).FirstOrDefault();
+#if HS2
+            LeftHandBaseData = root.GetComponentsInChildren<Illusion.Component.Correct.BaseData>().Where(x => x.name.Contains(LeftHandEffectorName)).FirstOrDefault();
+            RightHandBaseData = root.GetComponentsInChildren<Illusion.Component.Correct.BaseData>().Where(x => x.name.Contains(RightHandEffectorName)).FirstOrDefault();
+            LeftFootBaseData = root.GetComponentsInChildren<Illusion.Component.Correct.BaseData>().Where(x => x.name.Contains(LeftFootEffectorName)).FirstOrDefault();
+            RightFootBaseData = root.GetComponentsInChildren<Illusion.Component.Correct.BaseData>().Where(x => x.name.Contains(RightFootEffectorName)).FirstOrDefault();
+
+#else
+            LeftHandBaseData = root.GetComponentsInChildren<Correct.BaseData>().Where(x => x.name.Contains(LeftHandEffectorName)).FirstOrDefault();
+            RightHandBaseData = root.GetComponentsInChildren<Correct.BaseData>().Where(x => x.name.Contains(RightHandEffectorName)).FirstOrDefault();
+            LeftFootBaseData = root.GetComponentsInChildren<Correct.BaseData>().Where(x => x.name.Contains(LeftFootEffectorName)).FirstOrDefault();
+            RightFootBaseData = root.GetComponentsInChildren<Correct.BaseData>().Where(x => x.name.Contains(RightFootEffectorName)).FirstOrDefault();
+#endif
         }
 
         public void RememberTransform()
@@ -96,6 +134,67 @@ namespace Heels.Struct
                 isValidAngleLimit ? Mathf.Clamp(data.Roll.y, data.RollMin.y, data.RollMax.y) : data.Roll.y);
             target.RotateAround(anchorPosition, target.forward,
                 isValidAngleLimit ? Mathf.Clamp(data.Roll.z, data.RollMin.z, data.RollMax.z) : data.Roll.z);
+        }
+
+  /*      public void ApplyFeetEffectors(HeelsConfig config, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || LeftFootEffector == null || RightFootEffector == null)
+                return;
+
+            LeftFootEffector.position += config.Root;
+            RightFootEffector.position += config.Root;
+        }
+  */
+        public void ApplyLeftFootEffector(HeelsConfig config, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || LeftFootEffector == null || LeftFootBaseData?.bone == null)
+                return;
+
+            LeftFootEffector.position += config.Root.y * LeftFootEffector.up;
+            LeftFootBaseData.bone.position += config.Root.y * LeftFootEffector.up;
+        }
+
+        public void ApplyRightFootEffector(HeelsConfig config, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || RightFootEffector == null || RightFootBaseData?.bone == null)
+                return;
+
+            RightFootEffector.position += config.Root.y * RightFootEffector.up;
+            RightFootBaseData.bone.position += config.Root.y * LeftFootEffector.up;
+        }
+
+        public void ApplyLeftHandEffector(HeelsConfig config, bool isAnimatorActive, bool standHover)
+        {
+            if (!isAnimatorActive || LeftHandEffector == null || LeftHandBaseData?.bone == null)
+                return;
+
+            if (standHover)
+            {
+                LeftHandEffector.position -= config.Root;
+                LeftHandBaseData.bone.position -= config.Root;
+            }
+            else
+            {
+                LeftHandEffector.position += config.Root / 2;
+                LeftHandBaseData.bone.position += config.Root / 2;
+            }
+        }
+
+        public void ApplyRightHandEffector(HeelsConfig config, bool isAnimatorActive, bool standHover)
+        {
+            if (!isAnimatorActive || RightHandEffector == null || RightHandBaseData?.bone == null)
+                return;
+
+            if (standHover)
+            {
+                RightHandEffector.position -= config.Root;
+                RightHandBaseData.bone.position -= config.Root;
+            }
+            else
+            {
+                RightHandEffector.position += config.Root / 2;
+                RightHandBaseData.bone.position += config.Root / 2;
+            }
         }
     }
 }

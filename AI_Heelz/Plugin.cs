@@ -1,11 +1,12 @@
 ﻿using AIChara;
 using BepInEx;
 using BepInEx.Configuration;
-using BepInEx.Harmony;
 using HarmonyLib;
 using Heels.Controller;
-using KKAPI.Chara;
 using Util;
+using KKAPI.Chara;
+using UnityEngine;
+using System;
 
 namespace Heelz
 {
@@ -16,12 +17,16 @@ namespace Heelz
         public static ConfigEntry<bool> LoadDevXML { get; set; }
         public static ConfigEntry<bool> VerboseMode { get; set; }
 
+        internal static Harmony harmony;
+
         private void Start()
         {
             Util.Log.Logger.logSource = Logger;
             ConfigUtility.Initialize(Config);
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
-            HarmonyWrapper.PatchAll(typeof(HeelzPlugin));
+
+            harmony = new Harmony("AI_Heelz");
+            harmony.PatchAll(typeof(HeelzPlugin));
             Logger.LogInfo("[Heelz] Heels mode activated: destroy all foot");
             var loadedManifests = Sideloader.Sideloader.Manifests.Values;
             foreach (var manifest in loadedManifests) XMLLoader.LoadXML(manifest.manifestDocument);
@@ -35,14 +40,16 @@ namespace Heelz
         [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.ChangeCustomClothes))]
         public static void ChangeCustomClothes(ChaControl __instance, int kind)
         {
-            if (kind == 7) GetAPIController(__instance)?.ApplyHeelsData();
+            if (kind == 7)
+                GetAPIController(__instance)?.ApplyHeelsData();
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
         public static void SetClothesState(ChaControl __instance, int clothesKind, byte state, bool next = true)
         {
-            if (clothesKind == 7) GetAPIController(__instance)?.UpdateHover();
+            if (clothesKind == 7)
+                GetAPIController(__instance)?.UpdateHover();
         }
 
         [HarmonyPostfix]
@@ -50,10 +57,50 @@ namespace Heelz
         public static void LateUpdateForce(ChaControl __instance)
         {
             var heelsController = GetAPIController(__instance);
-            if (heelsController == null) return;
-            if (!__instance.fullBodyIK.isActiveAndEnabled) heelsController.Handler.UpdateFootAngle();
+
+            if (heelsController == null)
+                return;
+
+            if (!__instance.fullBodyIK.isActiveAndEnabled)
+                heelsController.Handler.UpdateFootAngle();
         }
 
+        //-- IK Solver Patch --//
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(RootMotion.SolverManager), "LateUpdate")]
+        public static void SolverManager_PreLateUpdate(RootMotion.SolverManager __instance)
+        {
+            ChaControl character = __instance.GetComponentInParent<ChaControl>();
+
+            if (character == null)
+                return;
+
+            var heelsController = GetAPIController(character);
+
+            if (heelsController == null)
+                return;
+
+            heelsController.Handler.UpdateEffectors();
+
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Animator), "Play", typeof(string), typeof(int), typeof(float))]
+        private static void Animator_Play(Animator __instance, string stateName)
+        {
+            var chaControl = __instance.GetComponentInParent<ChaControl>();
+
+            if (chaControl == null)
+                return;
+
+            var heelsController = GetAPIController(chaControl);
+
+            if (heelsController == null)
+                return;
+
+            heelsController.UpdateAnimation(stateName);
+        }
+		
         private static HeelsController GetAPIController(ChaControl character)
         {
             return character?.gameObject?.GetComponent<HeelsController>();
