@@ -29,7 +29,6 @@ namespace Heels.Handler
         public bool IsActive;
 
         public bool IsHover = false;
- //       public bool IsFootHover = false;
 
         public HeelsHandler(ChaControl chaControl)
         {
@@ -90,22 +89,21 @@ namespace Heels.Handler
             {
                 Console.WriteLine($"isHScene");
                 Console.WriteLine($"IsHover: {IsHover}");
- //               Console.WriteLine($"IsFootHover: {IsFootHover}");
+
                 if (IsHover)
                     HoverBody(false);
-
-//                if (IsFootHover)
-//                    HoverFeet(false);
 
                 return;
             }
 
             HoverBody(CanUpdate && currentAnimationType == AnimationType.Standing);
- //           HoverFeet(CanUpdate && currentAnimationType == AnimationType.Sitting);
         }
 
         public void UpdateAnimation(string animationName)
         {
+            if (ChaControl?.animBody?.runtimeAnimatorController == null)
+                return;
+
             currentAnimationType = AnimationType.Standing;
             currentHandHoverType = LimbHoverType.None;
             currentFootHoverType = LimbHoverType.None;
@@ -190,14 +188,6 @@ namespace Heels.Handler
             UpdateHandEffectors(Manager.HSceneManager.isHScene);
         }
 
- /*       public void UpdateFootEffectors()
-        {
-            if (!IsFootHover)
-                return;
-
-            TargetTransforms.ApplyFeetEffectors(Config, ChaControl.animBody.isActiveAndEnabled);
-        }
- */
         public void UpdateFootEffectors(bool forceOn)
         {
             if (forceOn || currentFootHoverType == LimbHoverType.Left || currentFootHoverType == LimbHoverType.Both)
@@ -242,18 +232,12 @@ namespace Heels.Handler
             ChildTransform.localPosition = !IsHover ? Vector3.zero : new Vector3(0, Config.Root.y, 0);
         }
 
- //       public void HoverFeet(bool hover)
- //       {
- //           IsFootHover = hover;
- //       }
-
         public void Reset()
         {
             if (ChaControl == null) 
                 return;
 
             IsHover = false;
- //           IsFootHover = false;
 
             UpdateStatus();
 

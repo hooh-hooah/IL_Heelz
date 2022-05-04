@@ -93,6 +93,26 @@ namespace Heelz
             if (chaControl == null)
                 return;
 
+            UpdateAnimation(chaControl, stateName);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Animator), "runtimeAnimatorController", MethodType.Setter)]
+        private static void ActorAnimation_runtimeAnimatorController(Animator __instance)
+        {
+            if (__instance.runtimeAnimatorController == null || __instance.runtimeAnimatorController.name.IsNullOrEmpty())
+                return;
+
+            var chaControl = __instance.GetComponentInParent<ChaControl>();
+
+            if (chaControl == null)
+                return;
+
+            UpdateAnimation(chaControl, "Idle");
+        }
+
+        private static void UpdateAnimation(ChaControl chaControl, string stateName)
+        {
             var heelsController = GetAPIController(chaControl);
 
             if (heelsController == null)
@@ -100,7 +120,7 @@ namespace Heelz
 
             heelsController.UpdateAnimation(stateName);
         }
-		
+
         private static HeelsController GetAPIController(ChaControl character)
         {
             return character?.gameObject?.GetComponent<HeelsController>();
