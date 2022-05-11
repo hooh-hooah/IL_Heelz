@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="abdata\list\heels\heels.unity3d" />
+    <None Include="heel height correction.pdf" />
     <None Include="hooh_AIHeelz.snk" />
     <None Include="packages.config" />
   </ItemGroup>
