@@ -18,6 +18,8 @@ namespace Heels.Struct
         public const string RightHandEffectorName = "f_t_arm_R";
         private const string LeftFootEffectorName = "f_t_leg_L";
         private const string RightFootEffectorName = "f_t_leg_R";
+        public const string LeftHandHintEffectorName = "f_t_elbo_L";
+        public const string RightHandHintEffectorName = "f_t_elbo_R";
 
         public Transform LeftFoot01;
         public Vector3[] LeftFoot01Memory;
@@ -35,6 +37,8 @@ namespace Heels.Struct
         public Transform RightHandEffector;
         public Transform LeftFootEffector;
         public Transform RightFootEffector;
+        public Transform LeftHandHintEffector;
+        public Transform RightHandHintEffector;
 #if HS2
         public Illusion.Component.Correct.BaseData LeftHandBaseData;
         public Illusion.Component.Correct.BaseData RightHandBaseData;
@@ -68,6 +72,9 @@ namespace Heels.Struct
             RightHandEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(RightHandEffectorName)).FirstOrDefault();
             LeftFootEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(LeftFootEffectorName)).FirstOrDefault();
             RightFootEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(RightFootEffectorName)).FirstOrDefault();
+            LeftHandHintEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(LeftHandHintEffectorName)).FirstOrDefault();
+            RightHandHintEffector = root.GetComponentsInChildren<Transform>().Where(x => x.name.Contains(RightHandHintEffectorName)).FirstOrDefault();
+
 #if HS2
             LeftHandBaseData = root.GetComponentsInChildren<Illusion.Component.Correct.BaseData>().Where(x => x.name.Contains(LeftHandEffectorName)).FirstOrDefault();
             RightHandBaseData = root.GetComponentsInChildren<Illusion.Component.Correct.BaseData>().Where(x => x.name.Contains(RightHandEffectorName)).FirstOrDefault();
@@ -145,55 +152,55 @@ namespace Heels.Struct
             RightFootEffector.position += config.Root;
         }
   */
-        public void ApplyLeftFootEffector(HeelsConfig config, bool isAnimatorActive)
+        public void ApplyLeftFootEffector(Vector3 offset, bool isAnimatorActive)
         {
             if (!isAnimatorActive || LeftFootEffector == null || LeftFootBaseData?.bone == null)
                 return;
 
-            LeftFootEffector.position += config.Root.y * LeftFootEffector.up;
-            LeftFootBaseData.bone.position += config.Root.y * LeftFootEffector.up;
+            LeftFootEffector.localPosition += offset.y * LeftFootEffector.up;
+            LeftFootBaseData.bone.localPosition += offset.y * LeftFootEffector.up;
         }
 
-        public void ApplyRightFootEffector(HeelsConfig config, bool isAnimatorActive)
+        public void ApplyRightFootEffector(Vector3 offset, bool isAnimatorActive)
         {
             if (!isAnimatorActive || RightFootEffector == null || RightFootBaseData?.bone == null)
                 return;
 
-            RightFootEffector.position += config.Root.y * RightFootEffector.up;
-            RightFootBaseData.bone.position += config.Root.y * LeftFootEffector.up;
+            RightFootEffector.localPosition += offset.y * RightFootEffector.up;
+            RightFootBaseData.bone.localPosition += offset.y * LeftFootEffector.up;
         }
 
-        public void ApplyLeftHandEffector(HeelsConfig config, bool isAnimatorActive, bool standHover)
+        public void ApplyLeftHandEffector(Vector3 offset, bool isAnimatorActive, bool standHover)
         {
             if (!isAnimatorActive || LeftHandEffector == null || LeftHandBaseData?.bone == null)
                 return;
 
             if (standHover)
             {
-                LeftHandEffector.position -= config.Root;
-                LeftHandBaseData.bone.position -= config.Root;
+                LeftHandEffector.localPosition -= offset;
+                LeftHandBaseData.bone.localPosition -= offset;
             }
             else
             {
-                LeftHandEffector.position += config.Root / 2;
-                LeftHandBaseData.bone.position += config.Root / 2;
+                LeftHandEffector.localPosition += offset / 2;
+                LeftHandBaseData.bone.localPosition += offset / 2;
             }
         }
 
-        public void ApplyRightHandEffector(HeelsConfig config, bool isAnimatorActive, bool standHover)
+        public void ApplyRightHandEffector(Vector3 offset, bool isAnimatorActive, bool standHover)
         {
             if (!isAnimatorActive || RightHandEffector == null || RightHandBaseData?.bone == null)
                 return;
 
             if (standHover)
             {
-                RightHandEffector.position -= config.Root;
-                RightHandBaseData.bone.position -= config.Root;
+                RightHandEffector.localPosition -= offset;
+                RightHandBaseData.bone.localPosition -= offset;
             }
             else
             {
-                RightHandEffector.position += config.Root / 2;
-                RightHandBaseData.bone.position += config.Root / 2;
+                RightHandEffector.localPosition += offset / 2;
+                RightHandBaseData.bone.localPosition += offset / 2;
             }
         }
     }

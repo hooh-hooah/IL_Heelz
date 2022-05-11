@@ -14,7 +14,8 @@ namespace Heels.Handler
         {
             Standing,  // Apply hover
             Sitting,   // Only hover feet
-            Prone      // Do nothing
+            Prone,      // Do nothing
+            Carried     // Do nothing
         };
 
         public enum LimbHoverType
@@ -22,7 +23,10 @@ namespace Heels.Handler
             None,      // Do not adjust limb when hovering
             Right, // Only adjust right limb
             Left,  // Only adjust left limb
-            Both  // adjust both limbs
+            Both,  // adjust both limbs
+            OffsetSitRight, // Only adjust right limb
+            OffsetSitLeft,  // Only adjust left limb
+            OffsetSitBoth  // adjust both limbs
         };
 
         public bool delegateRegistered;
@@ -87,9 +91,6 @@ namespace Heels.Handler
 
             if (Manager.HSceneManager.isHScene)
             {
-                Console.WriteLine($"isHScene");
-                Console.WriteLine($"IsHover: {IsHover}");
-
                 if (IsHover)
                     HoverBody(false);
 
@@ -191,10 +192,10 @@ namespace Heels.Handler
         public void UpdateFootEffectors(bool forceOn)
         {
             if (forceOn || currentFootHoverType == LimbHoverType.Left || currentFootHoverType == LimbHoverType.Both)
-                TargetTransforms.ApplyLeftFootEffector(Config, ChaControl.animBody.isActiveAndEnabled);
+                TargetTransforms.ApplyLeftFootEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled);
 
             if (forceOn || currentFootHoverType == LimbHoverType.Right || currentFootHoverType == LimbHoverType.Both)
-                TargetTransforms.ApplyRightFootEffector(Config, ChaControl.animBody.isActiveAndEnabled);
+                TargetTransforms.ApplyRightFootEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled);
         }
 
         public void UpdateHandEffectors(bool forceOff)
@@ -203,10 +204,10 @@ namespace Heels.Handler
                 return;
 
             if (currentHandHoverType == LimbHoverType.Left || currentHandHoverType == LimbHoverType.Both)
-                TargetTransforms.ApplyLeftHandEffector(Config, ChaControl.animBody.isActiveAndEnabled, currentAnimationType == AnimationType.Standing);
+                TargetTransforms.ApplyLeftHandEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled, currentAnimationType == AnimationType.Standing);
 
             if (currentHandHoverType == LimbHoverType.Right || currentHandHoverType == LimbHoverType.Both)
-                TargetTransforms.ApplyRightHandEffector(Config, ChaControl.animBody.isActiveAndEnabled, currentAnimationType == AnimationType.Standing);
+                TargetTransforms.ApplyRightHandEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled, currentAnimationType == AnimationType.Standing);
         }
 
         public void SetConfig(HeelsConfig shoeConfig)
