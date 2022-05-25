@@ -18,12 +18,15 @@ namespace Heelz
         public static ConfigEntry<bool> VerboseMode { get; set; }
 
         internal static Harmony harmony;
+        internal static ConfigEntry<bool> simpleHeelsInH;
 
         private void Start()
         {
             Util.Log.Logger.logSource = Logger;
             ConfigUtility.Initialize(Config);
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
+
+            simpleHeelsInH = Config.Bind("HScene", "SimpleHeels", false, "");
 
             harmony = new Harmony("AI_Heelz");
             harmony.PatchAll(typeof(HeelzPlugin));
@@ -81,12 +84,48 @@ namespace Heelz
                 return;
 
             heelsController.Handler.UpdateEffectors();
-
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Animator), "Play", typeof(string), typeof(int), typeof(float))]
-        private static void Animator_Play(Animator __instance, string stateName)
+        public static void Animator_Play(Animator __instance, string stateName)
+        {
+            var chaControl = __instance.GetComponentInParent<ChaControl>();
+
+            if (chaControl == null)
+                return;
+
+            UpdateAnimation(chaControl, stateName);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Animator), "PlayInFixedTime", typeof(string), typeof(int), typeof(float))]
+        public static void Animator_PlayInFixedTime(Animator __instance, string stateName)
+        {
+            var chaControl = __instance.GetComponentInParent<ChaControl>();
+
+            if (chaControl == null)
+                return;
+
+            UpdateAnimation(chaControl, stateName);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Animator), "CrossFadeInFixedTime", typeof(string), typeof(float), typeof(int), typeof(float), typeof(float))]
+        public static void Animator_CrossFadeInFixedTime(Animator __instance, string stateName)
+        {
+            var chaControl = __instance.GetComponentInParent<ChaControl>();
+
+            if (chaControl == null)
+                return;
+
+            UpdateAnimation(chaControl, stateName);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(Animator), "CrossFade", typeof(string), typeof(float), typeof(int), typeof(float), typeof(float))]
+
+        public static void Animator_CrossFade(Animator __instance, string stateName)
         {
             var chaControl = __instance.GetComponentInParent<ChaControl>();
 
@@ -98,7 +137,7 @@ namespace Heelz
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(Animator), "runtimeAnimatorController", MethodType.Setter)]
-        private static void ActorAnimation_runtimeAnimatorController(Animator __instance)
+        public static void ActorAnimation_runtimeAnimatorController(Animator __instance)
         {
             if (__instance.runtimeAnimatorController == null || __instance.runtimeAnimatorController.name.IsNullOrEmpty())
                 return;

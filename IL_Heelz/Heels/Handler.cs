@@ -5,6 +5,7 @@ using AIChara;
 using Heels.Struct;
 using RootMotion.FinalIK;
 using UnityEngine;
+using Heelz;
 
 namespace Heels.Handler
 {
@@ -12,21 +13,19 @@ namespace Heels.Handler
     {
         public enum AnimationType
         {
-            Standing,  // Apply hover
-            Sitting,   // Only hover feet
-            Prone,      // Do nothing
-            Carried     // Do nothing
+            Standing,      // Apply hover
+            FeetForward,   // Hover feet up and forward
+            FeetBackward,  // Hover feet up and backward
+            FeetUpward,    // Hover feet up
+            Carried        // Do nothing, don't rotate feet
         };
 
         public enum LimbHoverType
         {
             None,      // Do not adjust limb when hovering
-            Right, // Only adjust right limb
-            Left,  // Only adjust left limb
-            Both,  // adjust both limbs
-            OffsetSitRight, // Only adjust right limb
-            OffsetSitLeft,  // Only adjust left limb
-            OffsetSitBoth  // adjust both limbs
+            Right,     // Only adjust right limb
+            Left,      // Only adjust left limb
+            Both      // adjust both limbs
         };
 
         public bool delegateRegistered;
@@ -40,9 +39,11 @@ namespace Heels.Handler
             GameObject = chaControl.gameObject;
             Transform = GameObject.transform;
             ChildTransform = Transform.GetComponentsInChildren<Transform>().Where(x => x.name.Contains("cf_N_height")).FirstOrDefault();
+            HSceneTransform = Transform.GetComponentsInChildren<Transform>().Where(x => x.name.Contains("BodyTop")).FirstOrDefault();
             TargetTransforms = new TransformData(Transform);
             IKSolver = ChaControl.fullBodyIK.solver;
             currentAnimationType = AnimationType.Standing;
+            isHScene = false;
         }
 
         public IKSolverFullBodyBiped IKSolver { get; }
@@ -50,6 +51,8 @@ namespace Heels.Handler
         public TransformData TargetTransforms { get; }
 
         public Transform ChildTransform { get; }
+
+        public Transform HSceneTransform { get; }
 
         public Transform Transform { get; }
 
@@ -63,6 +66,12 @@ namespace Heels.Handler
                                  ChaControl != null &&
                                  ChaControl.fileStatus != null &&
                                  ChaControl.fileStatus.clothesState[Constant.ShoeCategory] == 0;
+
+        public bool CanOffset => ChaControl != null &&
+                                 ChaControl.fileParam != null &&
+                                 !Manager.HSceneManager.isHScene;
+
+        public bool isHScene { get; set; }
 
         public AnimationType currentAnimationType { get; set; }
 
@@ -87,14 +96,14 @@ namespace Heels.Handler
 
         public void UpdateStatus()
         {
-            Console.WriteLine($"UpdateStatus: {ChaControl.name}");
-
-            if (Manager.HSceneManager.isHScene)
+            if (isHScene != Manager.HSceneManager.isHScene)
             {
-                if (IsHover)
-                    HoverBody(false);
+                isHScene = Manager.HSceneManager.isHScene;
 
-                return;
+                if (isHScene)
+                    ChildTransform.localPosition = Vector3.zero;
+                else
+                    HSceneTransform.localPosition = Vector3.zero;
             }
 
             HoverBody(CanUpdate && currentAnimationType == AnimationType.Standing);
@@ -102,12 +111,15 @@ namespace Heels.Handler
 
         public void UpdateAnimation(string animationName)
         {
-            if (ChaControl?.animBody?.runtimeAnimatorController == null)
+            if (ChaControl.fileParam.sex == 0 || ChaControl?.animBody?.runtimeAnimatorController == null)
                 return;
 
-            currentAnimationType = AnimationType.Standing;
+            currentAnimationType = isHScene ? AnimationType.FeetUpward :AnimationType.Standing;
             currentHandHoverType = LimbHoverType.None;
-            currentFootHoverType = LimbHoverType.None;
+            currentFootHoverType = isHScene ? LimbHoverType.Both : LimbHoverType.None;
+
+            if (isHScene && HeelzPlugin.simpleHeelsInH.Value)
+                return;
 
             string assetBundlePath = $"list\\heels\\heels.unity3d";
             string assetName = ChaControl.animBody.runtimeAnimatorController.name;
@@ -177,7 +189,10 @@ namespace Heels.Handler
             if (!CanUpdate) 
                 return;
 
-            TargetTransforms.ApplyTransform(Config, ChaControl.animBody.isActiveAndEnabled);
+            bool updateLeft = currentAnimationType == AnimationType.Standing || currentFootHoverType == LimbHoverType.Left || currentFootHoverType == LimbHoverType.Both;
+            bool updateRight = currentAnimationType == AnimationType.Standing || currentFootHoverType == LimbHoverType.Right || currentFootHoverType == LimbHoverType.Both;
+
+            TargetTransforms.ApplyTransform(Config, ChaControl.animBody.isActiveAndEnabled, updateLeft, updateRight);
         }
 
         public void UpdateEffectors()
@@ -185,24 +200,21 @@ namespace Heels.Handler
             if (!CanUpdate)
                 return;
 
-            UpdateFootEffectors(Manager.HSceneManager.isHScene);
-            UpdateHandEffectors(Manager.HSceneManager.isHScene);
+            UpdateFootEffectors();
+            UpdateHandEffectors();
         }
 
-        public void UpdateFootEffectors(bool forceOn)
+        public void UpdateFootEffectors()
         {
-            if (forceOn || currentFootHoverType == LimbHoverType.Left || currentFootHoverType == LimbHoverType.Both)
-                TargetTransforms.ApplyLeftFootEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled);
+            if (currentFootHoverType == LimbHoverType.Left || currentFootHoverType == LimbHoverType.Both)
+                TargetTransforms.ApplyLeftFootEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled, currentAnimationType);
 
-            if (forceOn || currentFootHoverType == LimbHoverType.Right || currentFootHoverType == LimbHoverType.Both)
-                TargetTransforms.ApplyRightFootEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled);
+            if (currentFootHoverType == LimbHoverType.Right || currentFootHoverType == LimbHoverType.Both)
+                TargetTransforms.ApplyRightFootEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled, currentAnimationType);
         }
 
-        public void UpdateHandEffectors(bool forceOff)
+        public void UpdateHandEffectors()
         {
-            if (forceOff)
-                return;
-
             if (currentHandHoverType == LimbHoverType.Left || currentHandHoverType == LimbHoverType.Both)
                 TargetTransforms.ApplyLeftHandEffector(Config.Root, ChaControl.animBody.isActiveAndEnabled, currentAnimationType == AnimationType.Standing);
 
@@ -230,7 +242,10 @@ namespace Heels.Handler
         {
             IsHover = hover;
 
-            ChildTransform.localPosition = !IsHover ? Vector3.zero : new Vector3(0, Config.Root.y, 0);
+            if (Manager.HSceneManager.isHScene)
+                HSceneTransform.localPosition = !IsHover ? Vector3.zero : new Vector3(0, Config.Root.y, 0);
+            else
+                ChildTransform.localPosition = !IsHover ? Vector3.zero : new Vector3(0, Config.Root.y, 0);
         }
 
         public void Reset()

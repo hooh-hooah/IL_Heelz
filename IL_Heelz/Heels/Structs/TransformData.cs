@@ -1,4 +1,5 @@
 ﻿using CharaCustom;
+using Heels.Handler;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -21,6 +22,7 @@ namespace Heels.Struct
         public const string LeftHandHintEffectorName = "f_t_elbo_L";
         public const string RightHandHintEffectorName = "f_t_elbo_R";
 
+        public Transform Root;
         public Transform LeftFoot01;
         public Vector3[] LeftFoot01Memory;
         public Transform LeftFoot02;
@@ -56,6 +58,7 @@ namespace Heels.Struct
 
         public TransformData(Transform root)
         {
+            Root = root;
             LeftFoot01 = root.Find(LeftAnkle);
             LeftFoot02 = root.Find(LeftFoot);
             LeftToes01 = root.Find(LeftToes);
@@ -114,14 +117,21 @@ namespace Heels.Struct
             RightToes01Memory = zeroArray;
         }
 
-        public void ApplyTransform(HeelsConfig config, bool isAnimatorActive)
+        public void ApplyTransform(HeelsConfig config, bool isAnimatorActive, bool updateLeft, bool updateRight)
         {
-            ApplyTransformData(LeftFoot01, LeftFoot01Memory, config.Ankle, isAnimatorActive);
-            ApplyTransformData(RightFoot01, RightFoot01Memory, config.Ankle, isAnimatorActive);
-            ApplyTransformData(LeftFoot02, LeftFoot02Memory, config.Foot, isAnimatorActive);
-            ApplyTransformData(RightFoot02, RightFoot02Memory, config.Foot, isAnimatorActive);
-            ApplyTransformData(LeftToes01, LeftToes01Memory, config.Toes, isAnimatorActive);
-            ApplyTransformData(RightToes01, RightToes01Memory, config.Toes, isAnimatorActive);
+            if (updateLeft)
+            {
+                ApplyTransformData(LeftFoot01, LeftFoot01Memory, config.Ankle, isAnimatorActive);
+                ApplyTransformData(LeftFoot02, LeftFoot02Memory, config.Foot, isAnimatorActive);
+                ApplyTransformData(LeftToes01, LeftToes01Memory, config.Toes, isAnimatorActive);
+            }
+
+            if (updateRight)
+            {
+                ApplyTransformData(RightFoot01, RightFoot01Memory, config.Ankle, isAnimatorActive);
+                ApplyTransformData(RightFoot02, RightFoot02Memory, config.Foot, isAnimatorActive);
+                ApplyTransformData(RightToes01, RightToes01Memory, config.Toes, isAnimatorActive);
+            }
         }
 
         public static void ApplyTransformData(Transform target, Vector3[] memory, JointData data, bool isAnimatorActive)
@@ -131,7 +141,7 @@ namespace Heels.Struct
             if (!isAnimatorActive) return;
 
             target.localPosition += data.Move; // calculate from animation and abmx.
-            target.localScale = data.Scale; // calculate from abmx
+//            target.localScale = data.Scale; // calculate from abmx
 
             var anchorPosition = target.position;
             var isValidAngleLimit = data.RollMin != Vector3.zero || data.RollMax != Vector3.zero;
@@ -152,22 +162,62 @@ namespace Heels.Struct
             RightFootEffector.position += config.Root;
         }
   */
-        public void ApplyLeftFootEffector(Vector3 offset, bool isAnimatorActive)
+        public void ApplyLeftFootEffector(Vector3 offset, bool isAnimatorActive, HeelsHandler.AnimationType animationType)
         {
             if (!isAnimatorActive || LeftFootEffector == null || LeftFootBaseData?.bone == null)
                 return;
 
-            LeftFootEffector.localPosition += offset.y * LeftFootEffector.up;
-            LeftFootBaseData.bone.localPosition += offset.y * LeftFootEffector.up;
+            LeftFootEffector.position += offset.y * Root.up;
+            LeftFootBaseData.bone.position += offset.y * Root.up;
+
+            if (animationType == HeelsHandler.AnimationType.FeetForward)
+            {
+                LeftFootEffector.position += offset.y * Root.forward;
+                LeftFootBaseData.bone.position += offset.y * Root.forward;
+            }
+            else if (animationType == HeelsHandler.AnimationType.FeetBackward)
+            {
+                LeftFootEffector.position -= offset.y * Root.forward;
+                LeftFootBaseData.bone.position -= offset.y * Root.forward;
+            }
         }
 
-        public void ApplyRightFootEffector(Vector3 offset, bool isAnimatorActive)
+        public void ApplyRightFootEffector(Vector3 offset, bool isAnimatorActive, HeelsHandler.AnimationType animationType)
         {
             if (!isAnimatorActive || RightFootEffector == null || RightFootBaseData?.bone == null)
                 return;
 
-            RightFootEffector.localPosition += offset.y * RightFootEffector.up;
-            RightFootBaseData.bone.localPosition += offset.y * LeftFootEffector.up;
+            RightFootEffector.position += offset.y * Root.up;
+            RightFootBaseData.bone.position += offset.y * Root.up;
+
+            if (animationType == HeelsHandler.AnimationType.FeetForward)
+            {
+                RightFootEffector.position += offset.y * Root.forward;
+                RightFootBaseData.bone.position += offset.y * Root.forward;
+            }
+            else if (animationType == HeelsHandler.AnimationType.FeetBackward)
+            {
+                RightFootEffector.position -= offset.y * Root.forward;
+                RightFootBaseData.bone.position -= offset.y * Root.forward;
+            }
+        }
+
+        public void ApplyLeftFootEffectorOffset(Vector3 offset, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || LeftFootEffector == null || LeftFootBaseData?.bone == null)
+                return;
+
+            LeftFootEffector.localPosition += offset;
+            LeftFootBaseData.bone.localPosition += offset;
+        }
+
+        public void ApplyRightFootEffectorOffset(Vector3 offset, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || RightFootEffector == null || RightFootBaseData?.bone == null)
+                return;
+
+            RightFootEffector.localPosition += offset;
+            RightFootBaseData.bone.localPosition += offset;
         }
 
         public void ApplyLeftHandEffector(Vector3 offset, bool isAnimatorActive, bool standHover)
@@ -177,13 +227,13 @@ namespace Heels.Struct
 
             if (standHover)
             {
-                LeftHandEffector.localPosition -= offset;
-                LeftHandBaseData.bone.localPosition -= offset;
+                LeftHandEffector.position -= offset;
+                LeftHandBaseData.bone.position -= offset;
             }
             else
             {
-                LeftHandEffector.localPosition += offset / 2;
-                LeftHandBaseData.bone.localPosition += offset / 2;
+                LeftHandEffector.position += offset / 2;
+                LeftHandBaseData.bone.position += offset / 2;
             }
         }
 
@@ -194,14 +244,52 @@ namespace Heels.Struct
 
             if (standHover)
             {
-                RightHandEffector.localPosition -= offset;
-                RightHandBaseData.bone.localPosition -= offset;
+                RightHandEffector.position -= offset;
+                RightHandBaseData.bone.position -= offset;
             }
             else
             {
-                RightHandEffector.localPosition += offset / 2;
-                RightHandBaseData.bone.localPosition += offset / 2;
+                RightHandEffector.position += offset / 2;
+                RightHandBaseData.bone.position += offset / 2;
             }
+        }
+
+        public void SetLeftHandEffector(Vector3 position, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || LeftHandEffector == null || LeftHandBaseData?.bone == null)
+                return;
+
+            LeftHandEffector.position = position;
+            LeftHandBaseData.bone.position = position;
+        }
+
+        public void SetRightHandEffector(Vector3 position, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || RightHandEffector == null || RightHandBaseData?.bone == null)
+                return;
+
+            RightHandEffector.position = position;
+            RightHandBaseData.bone.position = position;
+        }
+
+        public void ApplyLeftHandEffectorWithHint(Vector3 offset, Vector3 hintOffset, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || LeftHandEffector == null || LeftHandHintEffector == null || LeftHandBaseData?.bone == null)
+                return;
+
+            LeftHandEffector.localPosition += offset;
+            LeftHandBaseData.bone.localPosition += offset;
+            LeftHandHintEffector.localPosition += hintOffset;
+        }
+
+        public void ApplyRightHandEffectorWithHint(Vector3 offset, Vector3 hintOffset, bool isAnimatorActive)
+        {
+            if (!isAnimatorActive || RightHandEffector == null || RightHandHintEffector == null || RightHandBaseData?.bone == null)
+                return;
+
+            RightHandEffector.localPosition += offset;
+            RightHandBaseData.bone.localPosition += offset;
+            RightHandHintEffector.localPosition += hintOffset;
         }
     }
 }
