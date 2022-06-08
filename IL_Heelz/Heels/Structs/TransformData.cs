@@ -167,18 +167,25 @@ namespace Heels.Struct
             if (!isAnimatorActive || LeftFootEffector == null || LeftFootBaseData?.bone == null)
                 return;
 
-            LeftFootEffector.position += offset.y * Root.up;
-            LeftFootBaseData.bone.position += offset.y * Root.up;
 
             if (animationType == HeelsHandler.AnimationType.FeetForward)
             {
-                LeftFootEffector.position += offset.y * Root.forward;
-                LeftFootBaseData.bone.position += offset.y * Root.forward;
+                LeftFootEffector.position += offset.y * LeftFoot02.forward;
+                LeftFootBaseData.bone.position += offset.y * LeftFoot02.forward;
+                LeftFootEffector.position += offset.y * Root.up;
+                LeftFootBaseData.bone.position += offset.y * Root.up;
             }
             else if (animationType == HeelsHandler.AnimationType.FeetBackward)
             {
-                LeftFootEffector.position -= offset.y * Root.forward;
-                LeftFootBaseData.bone.position -= offset.y * Root.forward;
+                LeftFootEffector.position -= offset.y * LeftFoot02.forward;
+                LeftFootBaseData.bone.position -= offset.y * LeftFoot02.forward;
+                LeftFootEffector.position += offset.y * Root.up;
+                LeftFootBaseData.bone.position += offset.y * Root.up;
+            }
+            else
+            {
+                LeftFootEffector.position += offset.y * LeftFootEffector.up;
+                LeftFootBaseData.bone.position += offset.y * LeftFootEffector.up;
             }
         }
 
@@ -187,18 +194,24 @@ namespace Heels.Struct
             if (!isAnimatorActive || RightFootEffector == null || RightFootBaseData?.bone == null)
                 return;
 
-            RightFootEffector.position += offset.y * Root.up;
-            RightFootBaseData.bone.position += offset.y * Root.up;
-
             if (animationType == HeelsHandler.AnimationType.FeetForward)
             {
-                RightFootEffector.position += offset.y * Root.forward;
-                RightFootBaseData.bone.position += offset.y * Root.forward;
+                RightFootEffector.position += offset.y * RightFoot02.forward;
+                RightFootBaseData.bone.position += offset.y * RightFoot02.forward;
+                RightFootEffector.position += offset.y * Root.up;
+                RightFootBaseData.bone.position += offset.y * Root.up;
             }
             else if (animationType == HeelsHandler.AnimationType.FeetBackward)
             {
-                RightFootEffector.position -= offset.y * Root.forward;
-                RightFootBaseData.bone.position -= offset.y * Root.forward;
+                RightFootEffector.position -= offset.y * RightFoot02.forward;
+                RightFootBaseData.bone.position -= offset.y * RightFoot02.forward;
+                RightFootEffector.position += offset.y * Root.up;
+                RightFootBaseData.bone.position += offset.y * Root.up;
+            }
+            else
+            {
+                RightFootEffector.position += offset.y * RightFootEffector.up;
+                RightFootBaseData.bone.position += offset.y * RightFootEffector.up;
             }
         }
 

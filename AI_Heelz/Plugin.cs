@@ -6,7 +6,6 @@ using Heels.Controller;
 using Util;
 using KKAPI.Chara;
 using UnityEngine;
-using System;
 
 namespace Heelz
 {
