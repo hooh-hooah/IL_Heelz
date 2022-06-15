@@ -117,21 +117,22 @@ namespace Heels.Struct
             RightToes01Memory = zeroArray;
         }
 
-        public void ApplyTransform(HeelsConfig config, bool isAnimatorActive, bool updateLeft, bool updateRight)
+        public void ApplyTransform(HeelsConfig config, bool isAnimatorActive, bool updateLeftAnkle, bool updateRightAnkle)
         {
-            if (updateLeft)
+            if (updateLeftAnkle)
             {
                 ApplyTransformData(LeftFoot01, LeftFoot01Memory, config.Ankle, isAnimatorActive);
                 ApplyTransformData(LeftFoot02, LeftFoot02Memory, config.Foot, isAnimatorActive);
-                ApplyTransformData(LeftToes01, LeftToes01Memory, config.Toes, isAnimatorActive);
             }
 
-            if (updateRight)
+            if (updateRightAnkle)
             {
                 ApplyTransformData(RightFoot01, RightFoot01Memory, config.Ankle, isAnimatorActive);
                 ApplyTransformData(RightFoot02, RightFoot02Memory, config.Foot, isAnimatorActive);
-                ApplyTransformData(RightToes01, RightToes01Memory, config.Toes, isAnimatorActive);
             }
+
+            ApplyTransformData(LeftToes01, LeftToes01Memory, config.Toes, isAnimatorActive);
+            ApplyTransformData(RightToes01, RightToes01Memory, config.Toes, isAnimatorActive);
         }
 
         public static void ApplyTransformData(Transform target, Vector3[] memory, JointData data, bool isAnimatorActive)

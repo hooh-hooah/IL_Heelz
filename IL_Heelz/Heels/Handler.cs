@@ -179,6 +179,13 @@ namespace Heels.Handler
             if (Int32.TryParse(assetItem[3], out result))
                 currentFootHoverType = (LimbHoverType)result;
 
+            if (!isHScene && HeelzPlugin.simpleHeelsInWorld.Value && currentAnimationType != AnimationType.Standing)
+            {
+                currentAnimationType = AnimationType.FeetUpward;
+                currentHandHoverType = LimbHoverType.None;
+                currentFootHoverType = LimbHoverType.Both;
+            }
+
             Console.WriteLine($"currentAnimationType: {currentAnimationType} {currentHandHoverType} {currentFootHoverType}");
 
             UpdateStatus();
@@ -189,10 +196,10 @@ namespace Heels.Handler
             if (!CanUpdate) 
                 return;
 
-            bool updateLeft = currentAnimationType == AnimationType.Standing || currentFootHoverType == LimbHoverType.Left || currentFootHoverType == LimbHoverType.Both;
-            bool updateRight = currentAnimationType == AnimationType.Standing || currentFootHoverType == LimbHoverType.Right || currentFootHoverType == LimbHoverType.Both;
+            bool updateLeftAnkle = HeelzPlugin.alwaysRotateHeels.Value || currentAnimationType == AnimationType.Standing || currentFootHoverType == LimbHoverType.Left || currentFootHoverType == LimbHoverType.Both;
+            bool updateRightAnkle = HeelzPlugin.alwaysRotateHeels.Value || currentAnimationType == AnimationType.Standing || currentFootHoverType == LimbHoverType.Right || currentFootHoverType == LimbHoverType.Both;
 
-            TargetTransforms.ApplyTransform(Config, ChaControl.animBody.isActiveAndEnabled, updateLeft, updateRight);
+            TargetTransforms.ApplyTransform(Config, ChaControl.animBody.isActiveAndEnabled, updateLeftAnkle, updateRightAnkle);
         }
 
         public void UpdateEffectors()

@@ -18,6 +18,8 @@ namespace Heelz
 
         internal static Harmony harmony;
         internal static ConfigEntry<bool> simpleHeelsInH;
+        internal static ConfigEntry<bool> simpleHeelsInWorld;
+        internal static ConfigEntry<bool> alwaysRotateHeels;
 
         private void Start()
         {
@@ -25,7 +27,9 @@ namespace Heelz
             ConfigUtility.Initialize(Config);
             CharacterApi.RegisterExtraBehaviour<HeelsController>(Constant.GUID);
 
-            simpleHeelsInH = Config.Bind("HScene", "SimpleHeels", false, "");
+            simpleHeelsInH = Config.Bind("Settings", "Simple Heels in HScenes", false, "Always adjust/rotate heels in HScenes, even when the character isn't standing.");
+            simpleHeelsInWorld = Config.Bind("Settings", "Simple Heels on World Map", false, "Always adjust/rotate heels on the World Map, even when the character isn't standing.");
+            alwaysRotateHeels = Config.Bind("Settings", "Always Rotate Heels", false, "Always rotate heels, even when the character isn't standing.");
 
             harmony = new Harmony("AI_Heelz");
             harmony.PatchAll(typeof(HeelzPlugin));
