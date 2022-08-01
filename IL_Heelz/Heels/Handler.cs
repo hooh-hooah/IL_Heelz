@@ -50,9 +50,9 @@ namespace Heels.Handler
 
         public TransformData TargetTransforms { get; }
 
-        public Transform ChildTransform { get; }
+        public Transform ChildTransform { get; set; }
 
-        public Transform HSceneTransform { get; }
+        public Transform HSceneTransform { get; set; }
 
         public Transform Transform { get; }
 
@@ -94,16 +94,60 @@ namespace Heels.Handler
             TargetTransforms.ForgetTransform();
         }
 
+        public void ResetBodyPosition()
+        {
+            if (isHScene)
+            {
+                if (ChildTransform == null)
+                    ChildTransform = Transform?.GetComponentsInChildren<Transform>().Where(x => x.name.Contains("cf_N_height")).FirstOrDefault();
+
+                if (ChildTransform == null)
+                    return;
+
+                ChildTransform.localPosition = Vector3.zero;
+            }
+            else
+            {
+                if (HSceneTransform == null)
+                    HSceneTransform = Transform.GetComponentsInChildren<Transform>().Where(x => x.name.Contains("BodyTop")).FirstOrDefault();
+
+                if (HSceneTransform == null)
+                    return;
+
+                HSceneTransform.localPosition = Vector3.zero;
+            }
+        }
+
+        public void SetBodyPosition(Vector3 position)
+        {
+            if (isHScene)
+            {
+                if (HSceneTransform == null)
+                    HSceneTransform = Transform.GetComponentsInChildren<Transform>().Where(x => x.name.Contains("BodyTop")).FirstOrDefault();
+
+                if (HSceneTransform == null)
+                    return;
+
+                HSceneTransform.localPosition = position;
+            }
+            else
+            {
+                if (ChildTransform == null)
+                    ChildTransform = Transform?.GetComponentsInChildren<Transform>().Where(x => x.name.Contains("cf_N_height")).FirstOrDefault();
+
+                if (ChildTransform == null)
+                    return;
+
+                ChildTransform.localPosition = position;
+            }
+        }
+
         public void UpdateStatus()
         {
             if (isHScene != Manager.HSceneManager.isHScene)
             {
                 isHScene = Manager.HSceneManager.isHScene;
-
-                if (isHScene)
-                    ChildTransform.localPosition = Vector3.zero;
-                else
-                    HSceneTransform.localPosition = Vector3.zero;
+                ResetBodyPosition();
             }
 
             HoverBody(CanUpdate && currentAnimationType == AnimationType.Standing);
@@ -124,11 +168,11 @@ namespace Heels.Handler
             string assetBundlePath = $"list\\heels\\heels.unity3d";
             string assetName = ChaControl.animBody.runtimeAnimatorController.name;
 
-            Console.WriteLine($"UpdateAnimation: {ChaControl.name} {assetName} {animationName}");
+            Debug.Log($"UpdateAnimation: {ChaControl.name} {assetName} {animationName}");
             // change the hover behavior based on the game state.
             if (!AssetBundleCheck.IsFile(assetBundlePath, assetName))
             {
-                Console.WriteLine($"Could not locate {assetBundlePath}");
+                Debug.Log($"Could not locate {assetBundlePath}");
                 return;
             }
          
@@ -136,7 +180,7 @@ namespace Heels.Handler
             AssetBundleManager.UnloadAssetBundle(assetBundlePath, true, null, false);
             if (assetBundleLoadAssetOperation.IsEmpty())
             {
-                Console.WriteLine($"assetBundleLoadAssetOperation is empty");
+                Debug.Log($"assetBundleLoadAssetOperation is empty");
                 return;
             }
 
@@ -147,7 +191,7 @@ namespace Heels.Handler
 
             if (assetList.IsNullOrEmpty())
             {
-                Console.WriteLine($"assetList is empty");
+                Debug.Log($"assetList is empty");
                 return;
             }
 
@@ -166,7 +210,7 @@ namespace Heels.Handler
             
             if (assetItem == null || !assetItemFound)
             {
-                Console.WriteLine($"assetItem Not Found");
+                Debug.Log($"assetItem Not Found");
                 return;
             }
 
@@ -186,7 +230,7 @@ namespace Heels.Handler
                 currentFootHoverType = LimbHoverType.Both;
             }
 
-            Console.WriteLine($"currentAnimationType: {currentAnimationType} {currentHandHoverType} {currentFootHoverType}");
+            Debug.Log($"currentAnimationType: {currentAnimationType} {currentHandHoverType} {currentFootHoverType}");
 
             UpdateStatus();
         }
@@ -248,11 +292,7 @@ namespace Heels.Handler
         public void HoverBody(bool hover)
         {
             IsHover = hover;
-
-            if (Manager.HSceneManager.isHScene)
-                HSceneTransform.localPosition = !IsHover ? Vector3.zero : new Vector3(0, Config.Root.y, 0);
-            else
-                ChildTransform.localPosition = !IsHover ? Vector3.zero : new Vector3(0, Config.Root.y, 0);
+            SetBodyPosition(!IsHover ? Vector3.zero : new Vector3(0, Config.Root.y, 0));
         }
 
         public void Reset()

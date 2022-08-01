@@ -3,6 +3,7 @@ using Heels.Handler;
 using System;
 using System.Linq;
 using UnityEngine;
+using Heelz;
 
 namespace Heels.Struct
 {
@@ -142,7 +143,9 @@ namespace Heels.Struct
             if (!isAnimatorActive) return;
 
             target.localPosition += data.Move; // calculate from animation and abmx.
-//            target.localScale = data.Scale; // calculate from abmx
+
+            if (HeelzPlugin.applyHeelsScale.Value)
+                target.localScale = data.Scale; // calculate from abmx
 
             var anchorPosition = target.position;
             var isValidAngleLimit = data.RollMin != Vector3.zero || data.RollMax != Vector3.zero;
@@ -154,15 +157,6 @@ namespace Heels.Struct
                 isValidAngleLimit ? Mathf.Clamp(data.Roll.z, data.RollMin.z, data.RollMax.z) : data.Roll.z);
         }
 
-  /*      public void ApplyFeetEffectors(HeelsConfig config, bool isAnimatorActive)
-        {
-            if (!isAnimatorActive || LeftFootEffector == null || RightFootEffector == null)
-                return;
-
-            LeftFootEffector.position += config.Root;
-            RightFootEffector.position += config.Root;
-        }
-  */
         public void ApplyLeftFootEffector(Vector3 offset, bool isAnimatorActive, HeelsHandler.AnimationType animationType)
         {
             if (!isAnimatorActive || LeftFootEffector == null || LeftFootBaseData?.bone == null)

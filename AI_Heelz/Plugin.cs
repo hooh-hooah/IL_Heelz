@@ -20,6 +20,7 @@ namespace Heelz
         internal static ConfigEntry<bool> simpleHeelsInH;
         internal static ConfigEntry<bool> simpleHeelsInWorld;
         internal static ConfigEntry<bool> alwaysRotateHeels;
+        internal static ConfigEntry<bool> applyHeelsScale;
 
         private void Start()
         {
@@ -30,6 +31,7 @@ namespace Heelz
             simpleHeelsInH = Config.Bind("Settings", "Simple Heels in HScenes", false, "Always adjust/rotate heels in HScenes, even when the character isn't standing.");
             simpleHeelsInWorld = Config.Bind("Settings", "Simple Heels on World Map", false, "Always adjust/rotate heels on the World Map, even when the character isn't standing.");
             alwaysRotateHeels = Config.Bind("Settings", "Always Rotate Heels", false, "Always rotate heels, even when the character isn't standing.");
+            applyHeelsScale = Config.Bind("Settings", "Apply Heels Foot Scale", true, "Apply the foot scale associated with the heel clothing item.  This will override foot scaling done in character editor.");
 
             harmony = new Harmony("AI_Heelz");
             harmony.PatchAll(typeof(HeelzPlugin));
@@ -52,7 +54,7 @@ namespace Heelz
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.SetClothesState))]
-        public static void SetClothesState(ChaControl __instance, int clothesKind, byte state, bool next = true)
+        public static void SetClothesState(ChaControl __instance, int clothesKind)
         {
             if (clothesKind == 7)
                 GetAPIController(__instance)?.UpdateHover();
@@ -76,6 +78,9 @@ namespace Heelz
         [HarmonyPatch(typeof(RootMotion.SolverManager), "LateUpdate")]
         public static void SolverManager_PreLateUpdate(RootMotion.SolverManager __instance)
         {
+            if (!IsMainGame())
+                return;
+
             ChaControl character = __instance.GetComponentInParent<ChaControl>();
 
             if (character == null)
@@ -93,6 +98,9 @@ namespace Heelz
         [HarmonyPatch(typeof(Animator), "Play", typeof(string), typeof(int), typeof(float))]
         public static void Animator_Play(Animator __instance, string stateName)
         {
+            if (!IsMainGame())
+                return;
+
             var chaControl = __instance.GetComponentInParent<ChaControl>();
 
             if (chaControl == null)
@@ -105,6 +113,9 @@ namespace Heelz
         [HarmonyPatch(typeof(Animator), "PlayInFixedTime", typeof(string), typeof(int), typeof(float))]
         public static void Animator_PlayInFixedTime(Animator __instance, string stateName)
         {
+            if (!IsMainGame())
+                return;
+
             var chaControl = __instance.GetComponentInParent<ChaControl>();
 
             if (chaControl == null)
@@ -117,6 +128,9 @@ namespace Heelz
         [HarmonyPatch(typeof(Animator), "CrossFadeInFixedTime", typeof(string), typeof(float), typeof(int), typeof(float), typeof(float))]
         public static void Animator_CrossFadeInFixedTime(Animator __instance, string stateName)
         {
+            if (!IsMainGame())
+                return;
+
             var chaControl = __instance.GetComponentInParent<ChaControl>();
 
             if (chaControl == null)
@@ -130,6 +144,9 @@ namespace Heelz
 
         public static void Animator_CrossFade(Animator __instance, string stateName)
         {
+            if (!IsMainGame())
+                return;
+
             var chaControl = __instance.GetComponentInParent<ChaControl>();
 
             if (chaControl == null)
@@ -142,7 +159,7 @@ namespace Heelz
         [HarmonyPatch(typeof(Animator), "runtimeAnimatorController", MethodType.Setter)]
         public static void ActorAnimation_runtimeAnimatorController(Animator __instance)
         {
-            if (__instance.runtimeAnimatorController == null || __instance.runtimeAnimatorController.name.IsNullOrEmpty())
+            if (!IsMainGame() || __instance.runtimeAnimatorController == null || __instance.runtimeAnimatorController.name.IsNullOrEmpty())
                 return;
 
             var chaControl = __instance.GetComponentInParent<ChaControl>();
@@ -166,6 +183,11 @@ namespace Heelz
         private static HeelsController GetAPIController(ChaControl character)
         {
             return character?.gameObject?.GetComponent<HeelsController>();
+        }
+
+        public static bool IsMainGame()
+        {
+            return BepInEx.Paths.ProcessName == "AI-Syoujyo";
         }
     }
 }

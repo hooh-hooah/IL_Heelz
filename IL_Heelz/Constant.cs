@@ -9,6 +9,6 @@ public static class Constant
     public const string GUID = "com.hooh.ai.heelz";
     public const string NAME = "AIHeelz";
 #endif
-    public const string VERSION = "1.15.3";
+    public const string VERSION = "1.15.4";
     public const int ShoeCategory = 7;
 }
